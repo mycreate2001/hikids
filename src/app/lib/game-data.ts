@@ -30,13 +30,14 @@ export const datas:AlphabetData[]=[
     {n:'y',s:'i'}
 ]
 
+
+//////////////////// function ///////////////////////
 export function rand<T>(arrs:T[]):T[]{
     const db:T[]=[...arrs];
     const outs:T[]=[];
     let pos:number=0;
     while(db.length){
         pos=Math.round(Math.random()*(db.length-1));
-        console.log("test ",{pos});
         // tmp=db[pos];
         outs.push(db[pos]);
         db.splice(pos,1)
@@ -44,6 +45,20 @@ export function rand<T>(arrs:T[]):T[]{
     return outs;
 }
 
+export function pickup<T extends object>(arrs:T[],length:number,cpos:number):T[]{
+    const _arrs:T[]=[...arrs];
+    _arrs.splice(cpos,1);
+    const outs:T[]=[];
+    let pos:number=0;
+    for(let i=0;i<length;i++){
+        pos=Math.round(Math.random()*(_arrs.length-1))
+        outs.push(_arrs[pos])
+        _arrs.splice(pos,1)
+    }
+    return outs;
+}
+
+/////////////// interface /////////////////////////////
 export interface AlphabetData{
     n:string;
     s:string;

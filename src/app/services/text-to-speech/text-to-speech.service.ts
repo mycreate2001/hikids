@@ -47,7 +47,7 @@ export class TextToSpeechService {
         if(!this.synth) throw new Error("Not support")
           setTimeout(()=>{
             const voices=this.synth.getVoices();
-            console.log("voices:",voices)
+            // console.log("voices:",voices)
             return resolve(voices)
         },1)
       }
@@ -103,7 +103,7 @@ export class TextToSpeechService {
     }
 
     this.selectedVoice.onend=(e)=>{
-      console.log("speed :'%s' finish",textContent,e);
+      console.log("speed :'%s'.",textContent);
     }
 
     //speak out

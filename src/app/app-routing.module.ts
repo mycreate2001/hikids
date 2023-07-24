@@ -16,8 +16,12 @@ const routes: Routes = [
     loadChildren: () => import('./pages/menu/menu.module').then( m => m.MenuPageModule)
   },
   {
-    path: 'game1',
-    loadChildren: () => import('./pages/game1/game1.module').then( m => m.Game1PageModule)
+    path: 'tim-chu',
+    loadChildren: () => import('./pages/tim-chu/tim-chu.module').then( m => m.TimChuPageModule)
+  },
+  {
+    path: 'doan-tu',
+    loadChildren: () => import('./pages/doan-tu/doan-tu.module').then( m => m.DoanTuPageModule)
   },
 ];
 
