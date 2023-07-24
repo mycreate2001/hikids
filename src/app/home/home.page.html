@@ -1,20 +1,61 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Blank
+      Text to speech
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <div class="speech-wrapper">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6">
+          <ion-label>Enter your text</ion-label>
+          <ion-textarea 
+            placeholder="Your text for speech conversion here..."
+            rows="20" [(ngModel)]="textContent"></ion-textarea>
+        </ion-col>
+
+        <ion-col size="6">
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                <ion-select placeholder="Select a voice..." [(ngModel)]="setting.voice">
+                  <ion-select-option *ngFor="let voice of voices; let i = index" [value]="voice.name">{{ voice.name }}</ion-select-option>
+                </ion-select>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-label>Pitch</ion-label>
+                <ion-range [(ngModel)]="setting.pitch" [min]="0" [max]="2" [step]="0.1" [pin]="true" [ticks]="true" [snaps]="true"></ion-range>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-label>Rate</ion-label>
+                <ion-range [(ngModel)]="setting.rate" [min]="0" [max]="2"  [step]="0.1" [pin]="true" [ticks]="true" [snaps]="true"></ion-range>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-label>Volume</ion-label>
+                <ion-range [(ngModel)]="setting.volume" [min]="0" [max]="10"  [step]="1" [pin]="true" [ticks]="true" [snaps]="true"></ion-range>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+
+              <ion-col class="ion-text-end">
+                <ion-button (click)="play()">Play</ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-col>
+      </ion-row>
+
+
+    </ion-grid>
   </div>
 </ion-content>

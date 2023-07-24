@@ -1,27 +1,15 @@
-#container {
-  text-align: center;
+.speech-wrapper {
+  margin: 50px;
+} 
 
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+ion-select {
+  border-radius: 10px;
+  border: 1px solid rgba(225, 225, 225, 1);
+  padding: 20px;
+  margin-bottom: 25px;
+  margin-top: 15px;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
-}
-
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
+ion-textarea {
+  border: 1px solid rgba(225, 225, 225, 1);
 }
