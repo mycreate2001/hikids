@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { TextToSpeechService } from 'src/app/services/text-to-speech/text-to-speech.service';
-import { AlphabetData, datas, rand } from '../../lib/game-data';
+import { AlphabetData, colors, datas, rand } from '../../lib/game-data';
 import { Point } from 'src/app/lib/point.interface';
 
 @Component({
@@ -10,7 +10,11 @@ import { Point } from 'src/app/lib/point.interface';
 })
 export class TimChuPage implements OnInit {
   characters:AlphabetData[]=datas;//correct
-  views:ViewData[]=rand(datas).map(x=>{return{...x,check:false}});// display
+  views:ViewData[]=rand(datas)
+    .map((x,p)=>{
+      // const p=Math.round(Math.random()*colors.length);
+      return{...x,check:false,color:colors[p%colors.length]}
+    });// display
   pos:number=0;
   isAvailable:boolean=true;
   points:Point[]=[];
@@ -47,7 +51,8 @@ export class TimChuPage implements OnInit {
 }
 
 interface ViewData extends AlphabetData{
-  check:boolean
+  check:boolean;
+  color:string;
 }
 
 

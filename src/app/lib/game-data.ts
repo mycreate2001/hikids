@@ -27,9 +27,28 @@ export const datas:AlphabetData[]=[
     {n:'ư',s:'ư'},
     {n:'v',s:'vờ'},
     {n:'x',s:'xờ'},
-    {n:'y',s:'i'}
+    {n:'y',s:'Y'},
+    {n:'ch',s:'chờ'},
+    {n:'gh',s:'gờ'},
+    {n:'gi',s:'gi'},
+    {n:'kh',s:'khờ'},
+    {n:'ng',s:'ngờ'},
+    {n:'ngh',s:'nghờ'},
+    {n:'nh',s:'nhờ'},
+    {n:'th',s:'thờ'},
+    {n:'tr',s:'trờ'},
+    {n:'qu',s:'quờ'}
 ]
+//ch, gh, gi, kh, ng, ngh, nh, th, tr, qu
 
+export const colors=[
+    '#67a7ee',
+    '#8cee67',
+    '#7867ee',
+    '#ee67ea',
+    '#997042',
+    '#eeae67'
+]
 
 //////////////////// function ///////////////////////
 export function rand<T>(arrs:T[]):T[]{
@@ -45,9 +64,9 @@ export function rand<T>(arrs:T[]):T[]{
     return outs;
 }
 
-export function pickup<T extends object>(arrs:T[],length:number,cpos:number):T[]{
+export function pickup<T>(arrs:T[],length:number,cpos?:number):T[]{
     const _arrs:T[]=[...arrs];
-    _arrs.splice(cpos,1);
+    if(cpos!==undefined) _arrs.splice(cpos,1);
     const outs:T[]=[];
     let pos:number=0;
     for(let i=0;i<length;i++){
@@ -55,6 +74,7 @@ export function pickup<T extends object>(arrs:T[],length:number,cpos:number):T[]
         outs.push(_arrs[pos])
         _arrs.splice(pos,1)
     }
+    console.log("pickup:",outs);
     return outs;
 }
 

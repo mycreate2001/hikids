@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { AlphabetData, datas, pickup, rand } from 'src/app/lib/game-data';
+import { AlphabetData, colors, datas, pickup, rand } from 'src/app/lib/game-data';
 import { Point } from 'src/app/lib/point.interface';
 import { TextToSpeechService } from 'src/app/services/text-to-speech/text-to-speech.service';
 const _NUMBER_OF_CHARACTER=3
+interface AlphabetDataExt extends AlphabetData{
+  color:string;
+}
 @Component({
   selector: 'app-doan-tu',
   templateUrl: './doan-tu.page.html',
@@ -10,7 +13,7 @@ const _NUMBER_OF_CHARACTER=3
 })
 export class DoanTuPage implements OnInit {
   characters:AlphabetData[]=datas;
-  views:AlphabetData[]=[];
+  views:AlphabetDataExt[]=[];
   pos:number=0;
   cCha:AlphabetData=this.characters[this.pos];
   point=new Point();
@@ -26,7 +29,11 @@ export class DoanTuPage implements OnInit {
 
   build(){
     this.cCha=this.characters[this.pos];
-    this.views=[...pickup(this.characters,_NUMBER_OF_CHARACTER,this.pos),this.cCha];
+    const _colors=pickup(colors,_NUMBER_OF_CHARACTER+1);
+    this.views=[...pickup(this.characters,_NUMBER_OF_CHARACTER,this.pos),this.cCha]
+      .map((x,i)=>{
+        return {...x,color:_colors[i]}
+      });
     this.views=rand(this.views);
     this.delay=Date.now();
   }
@@ -37,7 +44,7 @@ export class DoanTuPage implements OnInit {
 
     //wrong
     if(correctData.n!==data.n){
-      this.tts.speak(`Đâu là chữ '${correctData.s}'`);
+      this.tts.speak(`Đây là chữ '${data.s}'. con cần tìm chữ '${correctData.s}'`);
       this.point.add(correctData.n,false,delay)
       this.build();
       return;

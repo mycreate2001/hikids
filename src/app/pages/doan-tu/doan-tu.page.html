@@ -11,7 +11,7 @@
   <ion-grid>
     <ion-row>
       <ion-col *ngFor="let data of views" (click)="check(data)">
-        <div class="card">
+        <div class="card" [ngStyle]="{'color':data.color}">
           <div class="content">{{data.n}}</div>
         </div>
       </ion-col>
