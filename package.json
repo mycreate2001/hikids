@@ -8,6 +8,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
+    "host":"ionic build --prod & firebase deploy --only hosting",
     "test": "ng test",
     "lint": "ng lint"
   },

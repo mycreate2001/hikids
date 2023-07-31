@@ -1,3 +1,21 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <ion-menu contentId="main">
+    <ion-content>
+      <ion-list>
+        <ion-list-header>Chò trơi</ion-list-header>
+        <ion-menu-toggle auto-hide="false" *ngFor="let page of pages; let pos=index">
+          <ion-item routerDirection="root" [routerLink]="page.url" lines="none" detail="false" routerLinkActive="currentPage">
+            <ion-thumbnail slot="start">
+              <img [src]="'../assets/png/'+page.image" title="page.name">
+            </ion-thumbnail>
+            <ion-label>
+              {{page.name}}
+              <p>{{page.note}}</p>
+            </ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+  <ion-router-outlet id="main"></ion-router-outlet>
 </ion-app>
