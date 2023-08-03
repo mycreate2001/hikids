@@ -34,7 +34,7 @@ export class TimChuPage implements OnInit {
     const correctData=this.characters[this.pos];
     // wrong
     if(data.n!==correctData.n){
-      this.tts.speak("đây là chữ '"+data.s+"' .con cần tìm chữ '"+correctData.s+"'");
+      this.tts.speak("đây là chữ '"+data.s+"' . Con cần tìm chữ '"+correctData.s+"'");
       return;
     }
     // correct word
