@@ -1,9 +1,12 @@
+import { AlphabetData } from "./interface";
+import { uuid } from "./minitools";
+
 export const datas:AlphabetData[]=[
-    {n:'a',s:'a',ex:['cái ca','quả cà','con cá']},
-    {n:'ă',s:'á',ex:['rau má']},
+    {n:'a',s:'a',ex:'cái ca, quả cà,con cá'},
+    {n:'ă',s:'á',ex:'rau má'},
     {n:'â',s:'ớ'},
-    {n:'b',s:'bờ',ex:['con bò','cái bờm','bươm bướm']},
-    {n:'c',s:'cờ',ex:['CÁI CỜ']},
+    {n:'b',s:'bờ',ex:'con bò, cái bờm,bươm bướm'},
+    {n:'c',s:'cờ',ex:'CÁI CỜ'},
     {n:'d',s:'dờ'},
     {n:'đ',s:'đờ'},
     {n:'e',s:'e'},
@@ -38,7 +41,7 @@ export const datas:AlphabetData[]=[
     {n:'th',s:'thờ'},
     {n:'tr',s:'trờ'},
     {n:'qu',s:'quờ'}
-]
+].map(item=>Object.assign(item,{id:uuid(),lang:'vi-VN',group:'Cơ bản'}))
 //ch, gh, gi, kh, ng, ngh, nh, th, tr, qu
 
 export const colors=[
@@ -79,9 +82,4 @@ export function pickup<T>(arrs:T[],length:number,cpos?:number):T[]{
 }
 
 /////////////// interface /////////////////////////////
-export interface AlphabetData{
-    n:string;
-    s:string;
-    ex?:string[];
-  }
   

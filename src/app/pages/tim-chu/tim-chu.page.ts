@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { TextToSpeechService } from 'src/app/services/text-to-speech/text-to-speech.service';
-import { AlphabetData, colors, datas, rand } from '../../lib/game-data';
+import {  colors, datas, rand } from '../../lib/game-data';
 import { Point } from 'src/app/lib/point.interface';
+import { AlphabetData } from 'src/app/lib/interface';
 
 @Component({
   selector: 'timchu',

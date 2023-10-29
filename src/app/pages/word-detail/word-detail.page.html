@@ -1,0 +1,49 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="secondary">
+    <ion-buttons slot="start">
+      <ion-button title="Back" (click)="done('back')">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        Quay lại
+      </ion-button>
+    </ion-buttons>
+    <ion-title>word-detail</ion-title>
+    <ion-buttons slot="end">
+      <ion-button title="Lưu" (click)="done('ok')">
+        Lưu
+        <ion-icon name="arrow-forward-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- group -->
+  <ion-item>
+    <ion-select [(ngModel)]="word.group" label="Nhóm từ">
+      <ion-select-option [value]="gr"*ngFor="let gr of groups">{{gr}}</ion-select-option>
+    </ion-select>
+    <ion-buttons slot="end">
+      <ion-button title="thêm nhóm" (click)="addGroup()" color="secondary">
+        <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-item>
+
+  <!-- language -->
+  <ion-item>
+    <ion-select label="Ngôn ngữ"[(ngModel)]="word.lang">
+      <ion-select-option [value]="lang.value" *ngFor="let lang of languages">{{lang.name}}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- others -->
+  <ion-item>
+    <ion-input label="Từ" [(ngModel)]="word.n"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-input label="Phát âm" [(ngModel)]="word.s"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-textarea label='Ví dụ' [(ngModel)]="ex"></ion-textarea>
+  </ion-item>
+</ion-content>

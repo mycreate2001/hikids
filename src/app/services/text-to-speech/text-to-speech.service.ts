@@ -14,6 +14,7 @@ export class TextToSpeechService {
 
   constructor() {
     this.init();
+    console.log("/*** init of tts ***/\n",this);
   }
 
   private async init(){
@@ -92,22 +93,26 @@ export class TextToSpeechService {
    * volume at which the text will be spoken. It can range from 0 to 1, where 0 is the lowest volume
    * (mute) and 1 is the highest volume.
    */
-  speak( textContent:string, opts?:Partial<TextToSpeechSetting>){
-    //set property
-    if(opts)  this.config(opts)
-    this.selectedVoice.text=textContent;
-    
-    //event
-    this.selectedVoice.onerror=(e)=>{
-      console.log("\n### ERROR ### ",e);
-    }
+  async speak( textContent:string, opts?:Partial<TextToSpeechSetting>):Promise<string>{
+    return new Promise((resolve,reject)=>{
+      //set property
+      if(opts)  this.config(opts)
+      this.selectedVoice.text=textContent;
+      
+      //event
+      this.selectedVoice.onerror=(e)=>{
+        console.log("\n### ERROR ### ",e);
+        return reject(e);
+      }
 
-    this.selectedVoice.onend=(e)=>{
-      console.log("speed :'%s'.",textContent);
-    }
+      this.selectedVoice.onend=(e)=>{
+        return resolve(textContent);
+      }
 
-    //speak out
-    this.synth.speak(this.selectedVoice);
+      //speak out
+      // console.log("speech:",textContent);
+      this.synth.speak(this.selectedVoice);
+    })
   }
 
   config(opts?:Partial<TextToSpeechSetting>){

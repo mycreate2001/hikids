@@ -8,7 +8,8 @@ import { Component } from '@angular/core';
 export class AppComponent {
   pages=[
     {name:'Tìm chữ',image:'abc.png',note:'giúp bé làm quen với bảng chữ cái',url:'tim-chu'},
-    {name:'Đoán từ',image:'abc.png',note:'Giúp bé đoán chữ cái',url:'doan-tu'}
+    {name:'Đoán từ',image:'abc.png',note:'Giúp bé đoán chữ cái',url:'doan-tu'},
+    {name:'Cài đặt',image:'abc.png',note:'cài đặt dữ liệu',url:'setting'}
   ]
   constructor() {}
 }

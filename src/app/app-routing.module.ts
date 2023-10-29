@@ -18,7 +18,15 @@ const routes: Routes = [
   {
     path: 'doan-tu',
     loadChildren: () => import('./pages/doan-tu/doan-tu.module').then( m => m.DoanTuPageModule)
+  },  {
+    path: 'setting',
+    loadChildren: () => import('./pages/setting/setting.module').then( m => m.SettingPageModule)
   },
+  {
+    path: 'word-detail',
+    loadChildren: () => import('./pages/word-detail/word-detail.module').then( m => m.WordDetailPageModule)
+  },
+
 ];
 
 @NgModule({

@@ -1,0 +1,61 @@
+<ion-header [translucent]="true" mode="ios">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>setting</ion-title>
+    <ion-buttons slot="end">
+      <ion-button title="Thêm từ" (click)="detail($event,{type:'add',group:''})">
+        <ion-icon name="bookmark-outline"></ion-icon>
+        Thêm từ
+      </ion-button>
+      <ion-button title="Lưu" (click)="save()" *ngIf="isChange()">
+        <ion-icon name="save-outline"></ion-icon>
+        Lưu
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" mode="ios">
+ <ng-container *ngIf="wordGroups.length; else no_word">
+  <ion-accordion-group>
+    <ion-accordion *ngFor="let wordGroup of wordGroups;let pos=index">
+      <ion-item slot="header">
+        <ion-label>{{wordGroup.group}}</ion-label>
+        <ion-note slot="end">
+          {{wordGroup.data.length}} từ
+        </ion-note>
+      </ion-item>
+      <ion-card slot="content">
+        <ion-card-header>abc</ion-card-header>
+        <ion-list>
+          <ion-item *ngFor="let word of wordGroup.data;let pW=index">
+            <ion-note slot="start">{{pW}}</ion-note>
+            <ion-label>
+              {{word.n}}:{{word.s}}
+              <p>{{word.ex}}</p>
+            </ion-label>
+            <ion-buttons slot="end">
+              <ion-button title="chèn thêm" (click)="detail($event,{type:'add',group:wordGroup.group})">
+                <ion-icon slot="icon-only" name="add"></ion-icon>
+              </ion-button>
+              <ion-button title="Sửa" (click)="detail($event,{type:'edit',word})">
+                <ion-icon slot="icon-only" name="create"></ion-icon>
+              </ion-button>
+              <ion-button title="Xóa" (click)="detail($event,{type:'delete',word})">
+                <ion-icon color="danger" slot="icon-only" name="trash"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-item>
+        </ion-list>
+      </ion-card>
+    </ion-accordion>
+   </ion-accordion-group>
+ </ng-container>
+</ion-content>
+
+
+<ng-template #no_word>
+  <div class="no_word">No word</div>
+</ng-template>
