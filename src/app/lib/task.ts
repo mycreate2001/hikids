@@ -1,6 +1,6 @@
 export class TaskManager{
     _tasks:Function[]=[];
-
+    _finish!:Function;;
    /**
     * The function `push` adds a callback function and its parameters to a list of tasks to be executed
     * asynchronously.
@@ -29,12 +29,24 @@ export class TaskManager{
      * determine the next task to be executed recursively.
      * @returns The function does not explicitly return anything.
      */
-    async run(pos=0){
+    private async _run(pos=0){
+        console.log("run pos:",pos);
         const task=this._tasks[pos];
-        if(!task) return;
+        if(!task) {
+            if(this._finish) this._finish();
+            return;
+        }
         await task()
-        this.run(pos+1)
+        this._run(pos+1)
     }
+
+    async start(){
+        return new Promise((resolve,reject)=>{
+            this._finish=()=>resolve('ok');
+            this._run();
+        })
+    }
+
     cancel(){
         this._tasks=[];//remove tasks
     }

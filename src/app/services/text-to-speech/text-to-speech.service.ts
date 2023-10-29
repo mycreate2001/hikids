@@ -94,6 +94,7 @@ export class TextToSpeechService {
    * (mute) and 1 is the highest volume.
    */
   async speak( textContent:string, opts?:Partial<TextToSpeechSetting>):Promise<string>{
+    console.log("speak options: ",opts);
     return new Promise((resolve,reject)=>{
       //set property
       if(opts)  this.config(opts)

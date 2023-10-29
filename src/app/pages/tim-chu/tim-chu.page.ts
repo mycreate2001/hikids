@@ -3,6 +3,7 @@ import { TextToSpeechService } from 'src/app/services/text-to-speech/text-to-spe
 import {  colors, datas, rand } from '../../lib/game-data';
 import { Point } from 'src/app/lib/point.interface';
 import { AlphabetData } from 'src/app/lib/interface';
+import { SpeakService } from 'src/app/services/speak/speak.service';
 
 @Component({
   selector: 'timchu',
@@ -17,33 +18,40 @@ export class TimChuPage implements OnInit {
       return{...x,check:false,color:colors[p%colors.length]}
     });// display
   pos:number=0;
-  isAvailable:boolean=true;
+  isAvailable:boolean=true;     //enable button
   points:Point[]=[];
   // ch:AlphabetData=this.characters[0];
-  constructor(private tts:TextToSpeechService) {
-
-  }
+  constructor(
+    private spk:SpeakService
+    ) {}
 
   ngOnInit() {
-    this.tts.config({lang:'vi-VN'});
-    this.tts.speak("Bắt đầu với chữ '"+this.characters[this.pos].s+"'")
+    this.spk.config({lang:'vi-VN'});
+    this.spk.speak("Bắt đầu với chữ '",this.characters[this.pos])
   }
 
 
   //button handle
   check(data:ViewData){
+    if(!this.isAvailable) return console.log(" ** WARN *** btn is not available now");
+    this.isAvailable=false;
     const correctData=this.characters[this.pos];
     // wrong
     if(data.n!==correctData.n){
-      this.tts.speak("đây là chữ '"+data.s+"' . Con cần tìm chữ '"+correctData.s+"'");
+      this.spk.speak("đây là chữ ",data,'Con cần tìm chữ ',correctData);
+      this.isAvailable=true;
       return;
     }
     // correct word
     this.pos++;data.check=true;
-    let msg=`chính xác! đây là chữ '${data.s}'!`
-    if(this.pos==this.characters.length) msg+="chúc mừng con đã hoàn thành cho chơi tìm chữ!"
-    else msg+=`chữ tiếp theo là '${this.characters[this.pos].s}'`
-    this.tts.speak(msg);
+    this.spk.speak("chính xác! đây là chữ ",data.s);
+    if(this.pos==this.characters.length) {
+      this.spk.speak("chúc mừng con đã hoàn thành cho chơi tìm chữ!");
+      this.isAvailable=true;
+      return;
+    }
+    this.spk.speak("chữ tiếp theo là",this.characters[this.pos]);
+    this.isAvailable=true;
   }
 
 
