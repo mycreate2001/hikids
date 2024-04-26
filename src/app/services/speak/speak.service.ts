@@ -18,38 +18,15 @@ export class SpeakService {
   }
 
   async speak(content:boolean|string|AlphabetData,...contents:(string|AlphabetData)[]):Promise<any>{
-    const tasks=new TaskManager();
     contents=typeof content!=='boolean'?[content,...contents]:contents;
     const isEx=typeof content==='boolean'?content:false;
-    contents.forEach(content=>{
-      const cb=()=>{
-          return typeof content==='string'?
-          this._speak(content)
-          :this._speak(isEx?content.s+"\n"+content.ex:content.s,content.lang)
+    contents.forEach(ct=>{
+      if(typeof ct==='string'){
+        this.tts.speak(ct);
+        return;
       }
-      tasks.push(cb);
-      
+      const msg:string=isEx?(ct.s+" "+ct.ex):ct.s;
+      this.tts.speak(msg,{lang:ct.lang})
     })
-    return tasks.start();
-    // contents.forEach(_content=>{
-    //   if(typeof _content==='string') return this.tts.speak(_content);
-      
-    //   const msg:string=isEx?(_content.s+" "+_content.ex):_content.s
-    //   if(_content.lang!==this.lang){
-    //     this.tts.speak(msg,{lang:_content.lang});
-    //     this.tts.config({lang:this.lang})
-    //   }
-    //   else this.tts.speak(msg);
-    //   return;
-    // })
-  }
-
-  private async _speak(txt:string,lang?:string){
-    if(lang && this.lang!==lang){
-      await this.tts.speak(txt,{lang})
-      this.tts.config({lang:this.lang})
-      return;
-    }
-    return this.tts.speak(txt);
   }
 }

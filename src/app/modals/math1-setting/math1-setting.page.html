@@ -1,0 +1,46 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="done('cancel')">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        Hủy
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Cài đặt Toán1</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="done('ok')" *ngIf="isUpdate()">
+        Lưu
+        <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    <ion-item>
+      <ion-input [(ngModel)]="settings.questionLength">
+        <div slot="label" color="primary">Số lượng câu hỏi</div>
+      </ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input [(ngModel)]="settings.qty" color="primary">
+        <div slot="label" color="primary">Số phép tính trong mỗi câu</div>
+      </ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-input [(ngModel)]="settings.max" color="primary">
+        <div slot="label" >Số lớn nhất</div>
+      </ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-toggle  [(ngModel)]="settings.allowMemory">Cho phép sử dụng phép tính có nhớ</ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-toggle  [(ngModel)]="settings.allowZero">Cho phép số 0 xuất hiện</ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-toggle [(ngModel)]="settings.allowMinus">Cho phép số âm</ion-toggle>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -26,6 +26,14 @@ const routes: Routes = [
     path: 'word-detail',
     loadChildren: () => import('./pages/word-detail/word-detail.module').then( m => m.WordDetailPageModule)
   },
+  {
+    path: 'math1',
+    loadChildren: () => import('./pages/math1/math1.module').then( m => m.Math1PageModule)
+  },
+  {
+    path: 'math1-setting',
+    loadChildren: () => import('./modals/math1-setting/math1-setting.module').then( m => m.Math1SettingPageModule)
+  },
 
 ];
 

@@ -1,0 +1,29 @@
+input.ip {
+    // padding: 3px;
+    height: 30px;
+    padding: 0 auto;
+    width: 30px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.mark {
+    border: solid 0.1px;
+    padding: 3px;
+    color: blue;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    text-align: center;
+    margin-right: 12px;
+}
+

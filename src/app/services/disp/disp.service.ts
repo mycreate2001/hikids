@@ -7,18 +7,18 @@ import { AlertController, AlertOptions, ModalController } from '@ionic/angular';
 export class DispService {
 
   constructor(
-    private modalCtr:ModalController,
+    private _modalCtr:ModalController,
     private alertCtr:AlertController
   ) { }
 
   async modal(component:any,props:any={}){
     props=JSON.parse(JSON.stringify(props));
-    const modal=await this.modalCtr.create({
+    const _modal=await this._modalCtr.create({
       component,
       componentProps:{...props,mode:'ios'}
     })
-    modal.present();
-    return modal.onDidDismiss();
+    _modal.present();
+    return _modal.onDidDismiss();
   }
 
   async alert(content:string|AlertOptions){

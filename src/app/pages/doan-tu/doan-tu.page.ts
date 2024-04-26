@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { AlertButton, AlertInput } from '@ionic/angular';
 import { colors, datas, pickup, rand } from 'src/app/lib/game-data';
 import { AlphabetData, SettingData, _DB_SETTING, _DB_SETTING_LANGUAGE, _DB_SETTING_WORDS, _DB_WORDS } from 'src/app/lib/interface';
-import { toArray } from 'src/app/lib/minitools';
+import { getList, toArray } from 'src/app/lib/minitools';
 import { Point } from 'src/app/lib/point.interface';
 import { TaskManager } from 'src/app/lib/task';
+import { DispService } from 'src/app/services/disp/disp.service';
 import { LocalDatabaseService } from 'src/app/services/localdatabase/local-database.service';
 import { SpeakService } from 'src/app/services/speak/speak.service';
 import { TextToSpeechService } from 'src/app/services/text-to-speech/text-to-speech.service';
@@ -17,7 +19,8 @@ interface AlphabetDataExt extends AlphabetData{
   styleUrls: ['./doan-tu.page.scss'],
 })
 export class DoanTuPage implements OnInit {
-  characters:AlphabetData[]=datas;
+  words:AlphabetData[]=[];
+  characters:AlphabetData[]=[];
   views:AlphabetDataExt[]=[];
   pos:number=0;
   cCha:AlphabetData=this.characters[this.pos];
@@ -25,22 +28,44 @@ export class DoanTuPage implements OnInit {
   delay!:number;
   lang:string='vi-VN';
   isAvailable:boolean=true;
+  groups:string[]=[];
   constructor(
     private spk:SpeakService,
-    private db:LocalDatabaseService
+    private db:LocalDatabaseService,
+    private disp:DispService
   ) { }
 
   async ngOnInit() {
     //database
-    this.characters=await this.db.search(_DB_WORDS);
-
+    this.words=await this.db.search(_DB_WORDS);
+    this.groups=getList(this.words,"group");
     /////
-    // this.tts.config({lang:this.lang});
-    this.spk.config({lang:this.lang})
     this.build();
     this.delay=Date.now();
-    // await this.tts.speak("gì vậy ta");
     await this.spk.speak(true,"Đâu là ",this.cCha);
+  }
+
+  filter(){
+    const groups:string[]=getList(this.characters,"group");
+    const inputs:AlertInput[]=groups.map(group=>{
+       const data:AlertInput={type:'checkbox',label:group,value:group,checked:this.groups.includes(group)}
+       return data;
+    })
+    const buttons:AlertButton[]=[{text:'OK',role:'ok'},{text:'cancel',role:'cancel'}]
+    this.disp.alert({header:'Lựa chọn nhóm',inputs,buttons})
+    .then(rs=>{
+      if(rs.role!=='ok') return;
+      this.groups=rs.data.values;
+      this._refresh();
+    })
+  }
+
+  private _refresh(){
+    this.characters=this.words.filter(x=>this.groups.includes(x.group));
+    this.views=this.characters.map((t,i)=>{
+      const data:AlphabetDataExt={...t,color:colors[i%colors.length]};
+      return data;
+    })
   }
 
   build(){
