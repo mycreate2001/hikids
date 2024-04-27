@@ -3,19 +3,21 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Toán 1</ion-title>
+    <ion-title>Toán 1
+    </ion-title>
     <ion-buttons slot="end">
 
-      <ion-button title="chơi lại" (click)="start()">
-        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      <ion-button title="chơi lại" (click)="start()" fill="outline" color="primary">
+        <ion-icon  name="refresh-outline"></ion-icon>
+        {{remainTime}}
       </ion-button>
 
-      <ion-button title="Chấm điểm" (click)="makePoint()">
-        <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+      <ion-button title="Chấm điểm" (click)="makePoint()" fill="outline" color="primary">
+        <ion-icon slot="icon-only" name="checkmark-done-circle-outline"></ion-icon>
       </ion-button>
 
-      <ion-button title="Cài đặt" (click)="setting()">
-        <ion-icon name="settings-outline"></ion-icon>
+      <ion-button title="Cài đặt" (click)="setting()" fill="outline" color="primary">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
       </ion-button>
 
     </ion-buttons>

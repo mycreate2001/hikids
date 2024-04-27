@@ -33,6 +33,13 @@
         <div slot="label" >Số lớn nhất</div>
       </ion-input>
     </ion-item>
+
+    <ion-item>
+      <ion-input [(ngModel)]="settings.limitTime" type="number" color="primary">
+        <div slot="label" >Thời gian mỗi câu [giây]</div>
+      </ion-input>
+    </ion-item>
+
     <ion-item>
       <ion-toggle  [(ngModel)]="settings.allowMemory">Cho phép sử dụng phép tính có nhớ</ion-toggle>
     </ion-item>

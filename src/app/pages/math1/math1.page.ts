@@ -20,16 +20,12 @@ interface View{
 export class Math1Page implements OnInit {
   database:Calc[]=[];
   views:View[]=[];
-
+  /** internal */
+  remainTime:number=0;
+  _lastTime:number=0;
+  private _timeOut:any=null;
   /** setting */
-  settings:MathSetting={
-    qty:3,
-    questionLength:20,
-    allowMemory:false,
-    allowMinus:false,
-    allowZero:false,
-    max:99
-  }            //so lon nhat
+  settings =CreateMathSetting();
   constructor(private disp:DispService) { }
 
   ngOnInit() {
@@ -39,6 +35,7 @@ export class Math1Page implements OnInit {
 
   /// buttons ///////////////
   start(){
+    this._stopTime();
     this.database=generate(this.settings.questionLength,{
       qty:this.settings.qty,
       max:this.settings.max,
@@ -48,10 +45,14 @@ export class Math1Page implements OnInit {
     })
     console.log(this.database);
     this.build();
+    this._startTime();
+    this._lastTime=Date.now();
   }
 
   makePoint(){
     // console.log(this.views);
+    const time=Date.now()-this._lastTime;
+    this._stopTime();
     const corrects=this.views.filter(view=>{
       const answer:number=parseInt(view.answer);
       view.checked=answer!==view.correct;
@@ -60,7 +61,7 @@ export class Math1Page implements OnInit {
     });
     const points:number=Math.round(10*corrects.length/this.views.length);
     console.log({points,corrects:corrects.length,views:this.views.length})
-    this.disp.alert(`Chúc mừng bạn được ${points} điểm!`);
+    this.disp.alert(`Chúc mừng bạn được ${points} điểm!<br>Thời gian làm ${time/1000} giây`);
   }
 
   setting(){
@@ -98,6 +99,19 @@ export class Math1Page implements OnInit {
     })
   }
 
+  /** start count timer */
+  private _startTime(){
+    this.remainTime=this.settings.questionLength*this.settings.limitTime;
+    this._timeOut=setInterval(()=>{
+      if(--this.remainTime<=0) this.makePoint();
+    },1000)
+  }
+
+  /** stop count timer */
+  private _stopTime(){
+    if(this._timeOut) clearInterval(this._timeOut)
+  }
+
   private _backup(){
     const strs=JSON.stringify(this.settings)
     localStorage.setItem(_DB_SETTING,strs);
@@ -108,7 +122,7 @@ export class Math1Page implements OnInit {
     try{
       if(!strs) return;
       const data=JSON.parse(strs);
-      this.settings=data;
+      this.settings=Object.assign({},this.settings,data);
     }
     catch(err){
       console.log("_restore error ",err);
@@ -212,4 +226,18 @@ export interface MathSetting{
   allowZero:boolean;          // 
   allowMinus:boolean;         // 
   max:number;                 // 
+  limitTime:number;           // time for each Question [second]
+}
+
+export function CreateMathSetting(opts:Partial<MathSetting>={}):MathSetting{
+  const df:MathSetting={
+    qty:2,
+    questionLength:10,
+    allowMemory:false,
+    allowMinus:false,
+    allowZero:false,
+    max:99,
+    limitTime:10
+  }
+  return Object.assign(df,opts)
 }

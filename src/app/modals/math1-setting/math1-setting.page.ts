@@ -10,12 +10,6 @@ const _BACKUP_LIST=['settings']
 export class Math1SettingPage implements OnInit {
   /** inputing */
   settings!:MathSetting
-  // qty:number=3;                 // qty of number for each question
-  // questionLength:number=20; //number of question
-  // allowMemory:boolean=false;
-  // allowZero:boolean=false;
-  // allowMinus:boolean=false;
-  // max:number=99;
   /** INTERNAL VARIABLE */
   backupStrs:string[]=[];
   constructor(private __modal:ModalController) { }
