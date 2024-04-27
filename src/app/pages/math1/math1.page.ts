@@ -8,6 +8,9 @@ const _BACKUP_LIST=['qty','questionLength','allowMemory',
 interface View{
   before:string;
   after:string;
+  correct:number;     // correct answer
+  answer:string;      // reply
+  checked:boolean;      // checked
 }
 @Component({
   selector: 'app-math1',
@@ -16,7 +19,7 @@ interface View{
 })
 export class Math1Page implements OnInit {
   database:Calc[]=[];
-  views:any[]=[];
+  views:View[]=[];
 
   /** setting */
   settings:MathSetting={
@@ -30,7 +33,7 @@ export class Math1Page implements OnInit {
   constructor(private disp:DispService) { }
 
   ngOnInit() {
-    this._backup();
+    this._restore();
     this.start();
   }
 
@@ -48,6 +51,16 @@ export class Math1Page implements OnInit {
   }
 
   makePoint(){
+    // console.log(this.views);
+    const corrects=this.views.filter(view=>{
+      const answer:number=parseInt(view.answer);
+      view.checked=answer!==view.correct;
+      return answer==view.correct;
+
+    });
+    const points:number=Math.round(10*corrects.length/this.views.length);
+    console.log({points,corrects:corrects.length,views:this.views.length})
+    this.disp.alert(`Chúc mừng bạn được ${points} điểm!`);
   }
 
   setting(){
@@ -61,6 +74,7 @@ export class Math1Page implements OnInit {
       if(role!=='ok') return;
       const {settings}=result.data as Math1SettingPageOutput;
       this.settings=settings;
+      this._backup();
       this.start();
     })
   }
@@ -78,15 +92,28 @@ export class Math1Page implements OnInit {
       st[db.pos].charAt(0):""
       const after=st.slice(db.pos+1,st.length+1).join(" ");
       console.log("test ",{db,pos:db.pos,before,after,st})
-      return {before,after}
+      let correct:number=db.pos===db.data.length?db.result:db.data[db.pos];
+      correct=Math.abs(correct);
+      return {before,after,correct,answer:'',checked:false}
     })
   }
 
-  _backup(){
-    
+  private _backup(){
+    const strs=JSON.stringify(this.settings)
+    localStorage.setItem(_DB_SETTING,strs);
   }
 
-  
+  private _restore(){
+    const strs=localStorage.getItem(_DB_SETTING);
+    try{
+      if(!strs) return;
+      const data=JSON.parse(strs);
+      this.settings=data;
+    }
+    catch(err){
+      console.log("_restore error ",err);
+    }
+  }
 
 }
 
