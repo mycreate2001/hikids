@@ -24,6 +24,7 @@ export class Math1Page implements OnInit {
   remainTime:number=0;
   _lastTime:number=0;
   private _timeOut:any=null;
+  private _his:{time:number,point:number}[]=[]
   /** setting */
   settings =CreateMathSetting();
   constructor(private disp:DispService) { }
@@ -36,6 +37,7 @@ export class Math1Page implements OnInit {
   /// buttons ///////////////
   start(){
     this._stopTime();
+    this._his=[];
     this.database=generate(this.settings.questionLength,{
       qty:this.settings.qty,
       max:this.settings.max,
@@ -51,7 +53,7 @@ export class Math1Page implements OnInit {
 
   makePoint(){
     // console.log(this.views);
-    const time=Date.now()-this._lastTime;
+    const time=Math.round((Date.now()-this._lastTime)/1000);
     this._stopTime();
     const corrects=this.views.filter(view=>{
       const answer:number=parseInt(view.answer);
@@ -59,16 +61,24 @@ export class Math1Page implements OnInit {
       return answer==view.correct;
 
     });
-    const points:number=Math.round(10*corrects.length/this.views.length);
-    console.log({points,corrects:corrects.length,views:this.views.length})
-    this.disp.alert(`Chúc mừng bạn được ${points} điểm!<br>Thời gian làm ${time/1000} giây`);
+    const point:number=Math.round(10*corrects.length/this.views.length);
+    // console.log({points,corrects:corrects.length,views:this.views.length})
+    this._his.push({time,point})
+    let his=this._his.map((x,i)=>`(${i+1}). ${x.point} điểm, ${x.time} giây`).join("<br>")
+    const message:string=`<p>
+      Chúc mừng bạn được <b>${point}</b> điểm!</p>
+      <p>Thời gian làm <b>${time}</b> giây</p>
+
+      <br>[<b>Lịch sử]</b><br>
+      ${his}`
+    this.disp.alert({header:'Chấm điểm',message,buttons:['OK'],cssClass:'tbl-point'});
   }
 
   setting(){
     const props:Math1SettingPageInput={
       settings:this.settings
     };
-    console.log("test-006: ",props)
+    // console.log("test-006: ",props)
     this.disp.modal(Math1SettingPage,props)
     .then(result=>{
       const role=result.role as Math1SettingPageRole;
@@ -92,7 +102,7 @@ export class Math1Page implements OnInit {
       before+=['+','-'].includes(st[db.pos].charAt(0))?
       st[db.pos].charAt(0):""
       const after=st.slice(db.pos+1,st.length+1).join(" ");
-      console.log("test ",{db,pos:db.pos,before,after,st})
+      // console.log("test ",{db,pos:db.pos,before,after,st})
       let correct:number=db.pos===db.data.length?db.result:db.data[db.pos];
       correct=Math.abs(correct);
       return {before,after,correct,answer:'',checked:false}
