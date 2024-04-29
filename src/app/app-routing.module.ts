@@ -18,7 +18,8 @@ const routes: Routes = [
   {
     path: 'doan-tu',
     loadChildren: () => import('./pages/doan-tu/doan-tu.module').then( m => m.DoanTuPageModule)
-  },  {
+  },
+  {
     path: 'setting',
     loadChildren: () => import('./pages/setting/setting.module').then( m => m.SettingPageModule)
   },
@@ -33,6 +34,10 @@ const routes: Routes = [
   {
     path: 'math1-setting',
     loadChildren: () => import('./modals/math1-setting/math1-setting.module').then( m => m.Math1SettingPageModule)
+  },
+  {
+    path: 'writting',
+    loadChildren: () => import('./pages/writting/writting.module').then( m => m.WrittingPageModule)
   },
 
 ];

@@ -1,0 +1,50 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Tập viết</ion-title>
+    <ion-buttons slot="end">
+      <ion-button title="Đọc" fill="outline" color="primary" (click)="start()">
+        <ion-icon [name]="isPause?'pause-circle-outline':'caret-forward-outline'"></ion-icon>
+        {{time}}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    <ion-textarea 
+        class="text" 
+        label="Đoạn văn" 
+        labelPlacement="floating" 
+        fill="outline" 
+        autoGrow="true" 
+        rows="10"
+        [(ngModel)]="text"
+        (ionChange)="updateText()"
+      >
+    </ion-textarea>
+
+    <ion-item (ionChange)="updateSetting()">
+      <ion-icon name="reader-outline" slot="start" color="primary"></ion-icon>
+      <ion-input label="Số lượng từ mỗi lần đọc" type="number" [(ngModel)]="setting.wordCount"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon slot="start" color="primary" name="refresh-outline"></ion-icon>
+      <ion-input type="number" label="Số lần đọc lại [lần]" [(ngModel)]="setting.repeat"></ion-input>
+    </ion-item>
+    
+    <ion-item>
+      <ion-icon  slot="start" color="primary" name="hourglass-outline"></ion-icon>
+      <ion-input type="number" label="Thời gian mỗi lần đọc [giây]" [(ngModel)]="setting.time"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon slot="start" color="primary" name="mic-outline"></ion-icon>
+      <ion-range label="Tốc độ đọc" labelPlacement="start" [(ngModel)]="setting.speed"></ion-range>
+    </ion-item>
+  </ion-list>
+</ion-content>
