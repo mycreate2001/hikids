@@ -1,0 +1,46 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="secondary">
+    <ion-buttons slot="start">
+      <ion-button title="Hủy" (click)="done('cancel')">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        Hủy
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Cài đặt viết</ion-title>
+    <ion-buttons slot="end">
+      <ion-button title="Lưu" (click)="done('ok')" *ngIf="isUpdate()">
+        Lưu
+        <ion-icon name="checkmark-done-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    <ion-item >
+      <ion-icon slot="start" name="reader-outline"  color="secondary"></ion-icon>
+      <ion-input type="number" label="Số lượng từ mỗi lần đọc" [(ngModel)]="settings.wordCount">
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon slot="start" color="secondary" name="refresh-outline"></ion-icon>
+      <ion-input type="number" label="Số lần đọc lại t.thiểu [Lần]" [(ngModel)]="settings.repeat">
+      </ion-input>
+    </ion-item>
+    
+    <ion-item>
+      <ion-icon  slot="start" color="secondary" name="hourglass-outline"></ion-icon>
+      <ion-input label="Thời gian đọc [Giây]" type="number" [(ngModel)]="settings.time">
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon  slot="start" color="secondary" name="hourglass-outline"></ion-icon>
+      <ion-input label="Tốc độ viết [Giây/từ]" type="number" [(ngModel)]="settings.writeSpeed">
+      </ion-input>
+    </ion-item>
+
+  </ion-list>
+</ion-content>

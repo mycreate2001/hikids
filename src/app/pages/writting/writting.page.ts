@@ -1,5 +1,18 @@
 import { Component, OnInit } from '@angular/core';
+import { WrittingConfigPage, WrittingConfigPageInput, WrittingConfigPageOutput, WrittingConfigPageRole } from 'src/app/modals/writting-config/writting-config.page';
+import { DispService } from 'src/app/services/disp/disp.service';
 import { TextToSpeechService } from 'src/app/services/text-to-speech/text-to-speech.service';
+// import { setInterval } from 'timers';
+const _BACKUP_LIST=["settings","text"];
+const _DB_WRITING="writting_config"
+
+const _SPECIALS= [
+  {v:/\./g,n:" -- chấm. "},{v:/\,/g,n:" --phẩy, "},
+  {v:/\?/g,n:" -- chấm hỏi? "},{v:/\:/g,n:" --hai chấm: "},
+  {v:/\;/g,n:" -- chấm phẩy; "},
+  // {v:/\n/g,n:" xuống dòng\n"},
+  {v:/\!/g,n:" -- chấm than! "}
+];
 
 @Component({
   selector: 'app-writting',
@@ -7,66 +20,114 @@ import { TextToSpeechService } from 'src/app/services/text-to-speech/text-to-spe
   styleUrls: ['./writting.page.scss'],
 })
 export class WrittingPage implements OnInit {
-  setting:Setting=createSetting();  // setting
+  settings:WrittingConfig=createSetting();  // setting
   text:string=''                    // text to read/write
   readStrs:string[]=[];
   pos:number=0;                     // reading position
   isPause:boolean=true;            // control play or pause
   time:number=0;
   repeatCount:number=0;
-  private _intervalCtr:any=null;             // control interval repeat reading
-  constructor(private tts:TextToSpeechService) { }
+  currentString:string=''
+  private _intervalCtr:any;             // control interval repeat reading
+  constructor(private tts:TextToSpeechService,
+    private disp:DispService
+  ) { }
 
   ngOnInit() {
-    this.tts.config({rate:0.4})
+    this._restore();
+    this.tts.config({rate:this.settings.speed})
     // this.text='  chuyền trên cành cây.   Vì sao sói lúc nào cũng cảm thấy buồn bực. Viết vào vở câu trả lời cho câu hỏi c ở mục 3'
     this.prepareWord();
+    this.tts.getVoices().then(voices=>console.log(voices))
+
   }
 
+
   //////////// BUTTONS //////////////
-  start(){
+  toggle(){
     this.isPause=!this.isPause
-    console.log("isPause:",this.isPause);
     if(this.isPause) return this.pause();
     this.startTime();
   }
 
+  changePos(pos:number){
+    this.pause();
+    this.pos=pos;
+    this.startTime();
+    // this.startTime();
+
+  }
+
   pause(){
-    if(this._intervalCtr) clearInterval(this._intervalCtr);
+    clearInterval(this._intervalCtr);
   }
 
   updateSetting(){
-    this.stop();
-    this.repeatCount=this.setting.repeat;
+    this._backup();
+    this.tts.config({rate:this.settings.speed});
+    this.pause(); //clear interval;
+    this.startTime();
+  }
+
+  setting(){
+    const props:WrittingConfigPageInput={
+      settings:this.settings
+    }
+    this.disp.modal(WrittingConfigPage,props)
+    .then(result=>{
+      const role=result.role as WrittingConfigPageRole;
+      if(role!=='ok') return;
+      const {settings}=result.data as WrittingConfigPageOutput
+      this.settings=settings;
+      this.updateSetting();
+    })
+  }
+
+  /** next sentent */
+  getNext(){
+    let text=this.readStrs[this.pos];
+    _SPECIALS.forEach(sp=>{
+      text=text.replace(sp.v,sp.n);
+    })
+    this.currentString=text;
+    this.repeatCount=this.getTimeCount();
   }
 
   startTime(){
+    this.getNext();
     this.speak();
-    this.time=this.setting.wordCount*this.setting.time;
-    this.repeatCount=this.setting.repeat;
+    this.time=this.settings.time;
+
     this._intervalCtr=setInterval(()=>{
-      if(--this.time==0){
-        this.time=this.setting.wordCount*this.setting.repeat;
-        if(--this.repeatCount==0){
-          this.repeatCount=this.setting.repeat;
+      if(--this.time<=0){
+        this.time=this.settings.time;
+        if(--this.repeatCount<=0){
           if(++this.pos==this.readStrs.length) return this.stop();
+          this.getNext();
         }
+        //speak
         this.speak();
       }
     },1000)
 
   }
 
+  getTimeCount():number{
+    let length=this.readStrs[this.pos].split(" ").length;
+    length=Math.round(length*this.settings.writeSpeed/this.settings.time)
+    const result= Math.max(length,this.settings.repeat);
+    return result;
+  }
+
   speak(){
-    const text:string=this.readStrs[this.pos];
-    console.log("speak:",text);
-    this.tts.speak(text);
+    console.log("speak:",this.currentString);
+    this.tts.speak(this.currentString);
   }
 
   stop(){
     this.pause();
     this.pos=0;
-    this.repeatCount=this.setting.repeat;
+    this.repeatCount=this.settings.repeat;
   }
 
   
@@ -75,46 +136,61 @@ export class WrittingPage implements OnInit {
   updateText(){
     this.prepareWord();
     this.stop();
+    this._backup();
+  }
+
+  private _restore(){
+    try{
+      const str=localStorage.getItem(_DB_WRITING);
+      if(!str) return;
+      const data=JSON.parse(str);
+      Object.keys(data).forEach(key=>{
+        const oldVal=(this as any)[key];
+        const bkpVal=data[key];
+        (this as any)[key]=Object.assign({},oldVal,bkpVal)
+      })
+      Object.assign(this,data);
+    }
+    catch(err){
+      console.log("\nERROR: ",err);
+    }
+  }
+
+  private _backup(){
+    const data:any={}
+    _BACKUP_LIST.forEach(key=>{
+        const val=(this as any)[key];
+        data[key]=val;
+    })
+    localStorage.setItem(_DB_WRITING,JSON.stringify(data))
   }
 
   prepareWord(){
-    const specials= [{v:/\./g,n:" chấm."},{v:/\,/g,n:" phẩy,"}];
-    let correctWord=this.text.split(" ").filter(x=>!!x);
-    console.log({correctWord})
-    const n=Math.ceil(correctWord.length/this.setting.wordCount);
-    let words:string[]=[];
-    let start:number=0;
-    let end:number=0;
-    let word:string=''
-    for(let i=0;i<n;i++){
-      start=i*this.setting.wordCount;
-      end=start+this.setting.wordCount;
-      word=correctWord.slice(start,end).join(" ")
-      specials.forEach(sp=>{
-        word=word.replace(sp.v,sp.n)
-      })
-      words.push(word);
-    }
-    console.log({words});
-    this.readStrs=words;
+   
+    //filter space
+    const text:string=this.text.split(" ").filter(x=>!!x).join(" ");
+    this.readStrs=text.split("\n").filter(x=>!!x);
   }
-
-
+  
 }
 
-interface Setting{
+
+export interface WrittingConfig{
   wordCount:number;   // work no for each time reading
   repeat:number;      // repeat times
   time:number;        // delay time for each reading
   speed:number;       // speed
+  writeSpeed:number;
 }
 
-function createSetting(opts:Partial<Setting>={}):Setting{
-  const df:Setting={
+function createSetting(opts:Partial<WrittingConfig>={}):WrittingConfig{
+  const df:WrittingConfig={
     wordCount:2,
     repeat:3,
     time:15,
-    speed:1
+    speed:0.4,
+    writeSpeed:7
   }
   return Object.assign(df,opts);
 }
+

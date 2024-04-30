@@ -38,7 +38,11 @@ const routes: Routes = [
   {
     path: 'writting',
     loadChildren: () => import('./pages/writting/writting.module').then( m => m.WrittingPageModule)
+  },  {
+    path: 'writting-config',
+    loadChildren: () => import('./modals/writting-config/writting-config.module').then( m => m.WrittingConfigPageModule)
   },
+
 
 ];
 

@@ -51,6 +51,15 @@ export class TextToSpeechService {
     })
   }
 
+  /**
+   * The function `grapVoice` in TypeScript selects a specific `SpeechSynthesisVoice` based on the
+   * provided voice name.
+   * @param {string} voice - The `voice` parameter in the `grapVoice` function is a string that
+   * represents the name of a specific SpeechSynthesisVoice that you want to retrieve from a list of
+   * available voices.
+   * @returns The `grapVoice` function is returning a `SpeechSynthesisVoice` object that matches the
+   * input `voice` string provided as a parameter.
+   */
   grapVoice(voice:string):SpeechSynthesisVoice{
     let selectVoice!:SpeechSynthesisVoice;
     for(let i=0;i<this.voices.length;i++){
@@ -63,6 +72,18 @@ export class TextToSpeechService {
   }
 
 
+  /**
+   * The `speak` function in TypeScript uses the Web Speech API to convert text content to speech with
+   * customizable settings.
+   * @param {string} textContent - The `textContent` parameter is a string that represents the text
+   * content that you want to be spoken out loud using text-to-speech technology.
+   * @param [opts] - The `opts` parameter in the `speak` function is an optional parameter that allows
+   * you to pass additional settings for the text-to-speech synthesis. It is of type
+   * `Partial<TextToSpeechSetting>`, which means it can be a partial object of the
+   * `TextToSpeechSetting` interface
+   * @returns The `speak` function returns a Promise that resolves with the `textContent` that was
+   * spoken.
+   */
   speak(textContent:string, opts?:Partial<TextToSpeechSetting>){
     return new Promise((resolve)=>{
       const speakSpcs:SpeechSynthesisUtterance=new SpeechSynthesisUtterance(textContent);
@@ -83,6 +104,13 @@ export class TextToSpeechService {
       })
   }
 
+  /**
+   * The `config` function in TypeScript merges the provided options with the existing
+   * `TextToSpeechSetting` settings.
+   * @param [opts] - The `opts` parameter in the `config` function is a partial object of type
+   * `TextToSpeechSetting`. It is used to update the settings of the text-to-speech functionality by
+   * merging its properties with the existing settings using `Object.assign`.
+   */
   config(opts?:Partial<TextToSpeechSetting>){
     Object.assign(this.setting,opts);
   }
