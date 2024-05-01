@@ -42,6 +42,10 @@ const routes: Routes = [
     path: 'writting-config',
     loadChildren: () => import('./modals/writting-config/writting-config.module').then( m => m.WrittingConfigPageModule)
   },
+  {
+    path: 'test',
+    loadChildren: () => import('./pages/test/test.module').then( m => m.TestPageModule)
+  },
 
 
 ];

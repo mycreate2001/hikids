@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { WrittingConfigPage, WrittingConfigPageInput, WrittingConfigPageOutput, WrittingConfigPageRole } from 'src/app/modals/writting-config/writting-config.page';
 import { DispService } from 'src/app/services/disp/disp.service';
+import { FptAiService } from 'src/app/services/fpt-ai/fpt-ai.service';
 import { TextToSpeechService } from 'src/app/services/text-to-speech/text-to-speech.service';
 // import { setInterval } from 'timers';
 const _BACKUP_LIST=["settings","text"];
@@ -28,10 +29,12 @@ export class WrittingPage implements OnInit {
   time:number=0;
   repeatCount:number=0;
   currentString:string=''
+  player!:HTMLAudioElement;
   private _intervalCtr:any;             // control interval repeat reading
   constructor(private tts:TextToSpeechService,
-    private disp:DispService
-  ) { }
+    private disp:DispService,
+    private fpt:FptAiService
+  ) { const a=this.fpt.player('')}
 
   ngOnInit() {
     this._restore();
@@ -39,7 +42,6 @@ export class WrittingPage implements OnInit {
     // this.text='  chuyền trên cành cây.   Vì sao sói lúc nào cũng cảm thấy buồn bực. Viết vào vở câu trả lời cho câu hỏi c ở mục 3'
     this.prepareWord();
     this.tts.getVoices().then(voices=>console.log(voices))
-
   }
 
 
@@ -83,19 +85,28 @@ export class WrittingPage implements OnInit {
     })
   }
 
+  makeVoice(cb:Function|null=null){
+    console.log("test-makeVoice");
+    this.fpt.tts(this.currentString).subscribe(res=>{
+      this.player=this.fpt.player(res.async);
+      this.player.play();
+      if(cb) cb()
+    })
+  }
+
   /** next sentent */
   getNext(){
+    console.log("test-getNext");
     let text=this.readStrs[this.pos];
     _SPECIALS.forEach(sp=>{
       text=text.replace(sp.v,sp.n);
     })
     this.currentString=text;
-    this.repeatCount=this.getTimeCount();
+    this.makeVoice();
   }
 
   startTime(){
     this.getNext();
-    this.speak();
     this.time=this.settings.time;
 
     this._intervalCtr=setInterval(()=>{
@@ -104,9 +115,9 @@ export class WrittingPage implements OnInit {
         if(--this.repeatCount<=0){
           if(++this.pos==this.readStrs.length) return this.stop();
           this.getNext();
+          this.repeatCount=this.getTimeCount();
         }
-        //speak
-        this.speak();
+        else this.speak();
       }
     },1000)
 
@@ -120,8 +131,10 @@ export class WrittingPage implements OnInit {
   }
 
   speak(){
-    console.log("speak:",this.currentString);
-    this.tts.speak(this.currentString);
+    // console.log("speak:",this.currentString);
+    // this.tts.speak(this.currentString);
+    console.log("test-speak");
+    if(this.player) this.player.play();
   }
 
   stop(){
