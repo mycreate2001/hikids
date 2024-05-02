@@ -21,16 +21,25 @@ const _SPECIALS= [
   styleUrls: ['./writting.page.scss'],
 })
 export class WrittingPage implements OnInit {
-  settings:WrittingConfig=createSetting();  // setting
-  text:string=''                    // text to read/write
-  readStrs:string[]=[];
-  pos:number=0;                     // reading position
-  isPause:boolean=true;            // control play or pause
-  time:number=0;
-  repeatCount:number=0;
-  currentString:string=''
-  player!:HTMLAudioElement;
-  private _intervalCtr:any;             // control interval repeat reading
+  /** setting */
+  settings:WrittingConfig=createSetting();      
+  /** content of param */
+  text:string=''                               
+  /** all sentents need to speak */
+  sentents:string[]=[];                        
+  /** current need to read */
+  sentent:string='';                            
+  /** position of current sentent need to speak */
+  pos:number=0;                                
+  /** status of application */
+  status:'start'|'pause'|'playing'='start';     
+  /** interval speaking times */
+  timeCount:number=0;                           
+  /** speak times for each sentent */
+  repeatCount:number=0;                        
+  /** control interval function */
+  private _intervalCtr:any;                    
+
   constructor(private tts:TextToSpeechService,
     private disp:DispService,
     private fpt:FptAiService
@@ -39,38 +48,52 @@ export class WrittingPage implements OnInit {
   ngOnInit() {
     this._restore();
     this.tts.config({rate:this.settings.speed})
-    // this.text='  chuyền trên cành cây.   Vì sao sói lúc nào cũng cảm thấy buồn bực. Viết vào vở câu trả lời cho câu hỏi c ở mục 3'
-    this.prepareWord();
-    this.tts.getVoices().then(voices=>console.log(voices))
+
   }
 
 
   //////////// BUTTONS //////////////
+
+  /** button play & pause */
   toggle(){
-    this.isPause=!this.isPause
-    if(this.isPause) return this.pause();
-    this.startTime();
+    /** first times runing */
+    if(this.status=='start'){
+      this.status='playing';
+      this.initial();
+      this.runing();
+      return;
+    }
+
+    /** resume play */
+    if(this.status=='pause'){
+      this.status='playing'
+      this.runing();
+      return;
+    }
+
+    /** resume */
+    if(this.status=='playing'){
+      this.status='pause';
+      this.pause();
+      return;
+    }
+    
   }
 
+   /** change position when click other sentent */
   changePos(pos:number){
-    this.pause();
+    if(pos===this.pos) return;// no action when click to current sentent
+    this.pause();             // stop count
+    //get new word
     this.pos=pos;
-    this.startTime();
-    // this.startTime();
-
+    this.prepareSentent();
+    this.timeCount=this.settings.time;
+    this.repeatCount=this.getRepeatCount();
+    this.runing();
+    this.speak();   //speaking for first times
   }
 
-  pause(){
-    clearInterval(this._intervalCtr);
-  }
-
-  updateSetting(){
-    this._backup();
-    this.tts.config({rate:this.settings.speed});
-    this.pause(); //clear interval;
-    this.startTime();
-  }
-
+  /** handle setting button */
   setting(){
     const props:WrittingConfigPageInput={
       settings:this.settings
@@ -85,72 +108,99 @@ export class WrittingPage implements OnInit {
     })
   }
 
-  makeVoice(cb:Function|null=null){
-    console.log("test-makeVoice");
-    this.fpt.tts(this.currentString).subscribe(res=>{
-      this.player=this.fpt.player(res.async);
-      this.player.play();
-      if(cb) cb()
-    })
+  /** handle sentents was edited */
+  updateSentents(){
+    console.log("test-updateSentents")
+    this.prepareSentents();
+    this._backup();
+    this.stop();
   }
 
-  /** next sentent */
-  getNext(){
-    console.log("test-getNext");
-    let text=this.readStrs[this.pos];
+
+  ////////// backuground /////////////
+
+  /** initial for begining times */
+  initial(){
+    this.prepareSentents();                   // separate to each sentent */
+    this.pos=0;                               // from begining */
+    this._intervalCtr=null;                   // reset ctr
+    this.prepareSentent();                    // get current sentent
+    this.timeCount=this.settings.time;
+    this.repeatCount=this.getRepeatCount();   // second
+    this.speak();     // speaking for first times
+  }
+
+
+  /** update new sentent */
+  prepareSentent(){
+    let text=this.sentents[this.pos];
     _SPECIALS.forEach(sp=>{
       text=text.replace(sp.v,sp.n);
     })
-    this.currentString=text;
-    this.makeVoice();
+    this.sentent=text;
   }
 
-  startTime(){
-    this.getNext();
-    this.time=this.settings.time;
-
-    this._intervalCtr=setInterval(()=>{
-      if(--this.time<=0){
-        this.time=this.settings.time;
-        if(--this.repeatCount<=0){
-          if(++this.pos==this.readStrs.length) return this.stop();
-          this.getNext();
-          this.repeatCount=this.getTimeCount();
-        }
-        else this.speak();
-      }
-    },1000)
-
-  }
-
-  getTimeCount():number{
-    let length=this.readStrs[this.pos].split(" ").length;
-    length=Math.round(length*this.settings.writeSpeed/this.settings.time)
-    const result= Math.max(length,this.settings.repeat);
+  /** get time(second) for each sentent */
+  getRepeatCount():number{
+    let wordsLength=this.sentent.split(" ").length;//words count
+    const times=Math.ceil(length*this.settings.writeSpeed/this.settings.time)
+    const result= Math.max(times,this.settings.repeat);
     return result;
   }
 
+  /** text to speak currentword */
   speak(){
     // console.log("speak:",this.currentString);
     // this.tts.speak(this.currentString);
-    console.log("test-speak");
-    if(this.player) this.player.play();
+    console.log("test-speak:",this.sentent);
+    // if(this.player) this.player.play();
   }
 
+  /** finish speaking */
   stop(){
     this.pause();
     this.pos=0;
-    this.repeatCount=this.settings.repeat;
+    this.status='start';
   }
 
+
+
+ 
+  /** pause speaking */
+  pause(){
+    if(this._intervalCtr )clearInterval(this._intervalCtr);
+  }
+
+  /** update settings
+   * It's just effect to next sentent or next speaking
+   */
+  updateSetting(){
+    this._backup(); 
+    this.runing();
+  }
+
+
+  runing(){
+    //reset controller
+    if(this._intervalCtr) clearInterval(this._intervalCtr);
+    //set new interval
+    this._intervalCtr=setInterval(()=>{
+      if(--this.timeCount<=0){
+        this.timeCount=this.settings.time;
+        if(--this.repeatCount<=0){
+          if(++this.pos>=this.sentents.length) return this.stop();
+          this.prepareSentent();/** get next content */
+          this.repeatCount=this.getRepeatCount();
+          this.speak();
+          return;
+        }
+
+        this.speak();/** speak current word */
+      }
+    },1000)
+  }
   
-
-  ////////// backuground /////////////
-  updateText(){
-    this.prepareWord();
-    this.stop();
-    this._backup();
-  }
+ 
 
   private _restore(){
     try{
@@ -178,11 +228,10 @@ export class WrittingPage implements OnInit {
     localStorage.setItem(_DB_WRITING,JSON.stringify(data))
   }
 
-  prepareWord(){
-   
-    //filter space
+  /** prepare sentents (all) */
+  prepareSentents(){
     const text:string=this.text.split(" ").filter(x=>!!x).join(" ");
-    this.readStrs=text.split("\n").filter(x=>!!x);
+    this.sentents=text.split("\n").filter(x=>!!x);
   }
   
 }

@@ -7,8 +7,8 @@
     <ion-buttons slot="end">
 
       <ion-button title="Đọc" fill="outline" color="primary" (click)="toggle()">
-        <ion-icon [name]="isPause?'pause-circle-outline':'caret-forward-outline'"></ion-icon>
-        {{repeatCount}}, {{time}}
+        <ion-icon [name]="status==='playing'?'pause-circle-outline':'caret-forward-outline'"></ion-icon>
+        {{repeatCount}}, {{timeCount}}
       </ion-button>
 
       <ion-button title="Đọc" fill="outline" color="primary" (click)="setting()">
@@ -29,11 +29,11 @@
         autoGrow="true" 
         rows="10"
         [(ngModel)]="text"
-        (ionChange)="updateText()"
+        (ionChange)="updateSentents()"
       >
     </ion-textarea>
   </ion-list>
-  <ion-chip *ngFor="let txt of readStrs;let p=index" [color]="p===pos?'primary':''" (click)="changePos(p)">
+  <ion-chip *ngFor="let txt of sentents;let p=index" [color]="p===pos?'primary':''" (click)="changePos(p)">
     <ion-label>{{txt}}</ion-label>
   </ion-chip>
 
