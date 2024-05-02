@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { WrittingConfigPage, WrittingConfigPageInput, WrittingConfigPageOutput, WrittingConfigPageRole } from 'src/app/modals/writting-config/writting-config.page';
 import { DispService } from 'src/app/services/disp/disp.service';
-import { FptAiService } from 'src/app/services/fpt-ai/fpt-ai.service';
+import { FptAiService } from 'src/app/services/fpt/fpt-ai.service';
 import { TextToSpeechService } from 'src/app/services/text-to-speech/text-to-speech.service';
 // import { setInterval } from 'timers';
 const _BACKUP_LIST=["settings","text"];
@@ -40,14 +40,14 @@ export class WrittingPage implements OnInit {
   /** control interval function */
   private _intervalCtr:any;                    
 
-  constructor(private tts:TextToSpeechService,
+  constructor(
     private disp:DispService,
     private fpt:FptAiService
-  ) { const a=this.fpt.player('')}
+  ) {}
 
   ngOnInit() {
     this._restore();
-    this.tts.config({rate:this.settings.speed})
+    this.prepareSentents();
 
   }
 
@@ -150,10 +150,7 @@ export class WrittingPage implements OnInit {
 
   /** text to speak currentword */
   speak(){
-    // console.log("speak:",this.currentString);
-    // this.tts.speak(this.currentString);
-    console.log("test-speak:",this.sentent);
-    // if(this.player) this.player.play();
+    this.fpt.speak(this.sentent);
   }
 
   /** finish speaking */

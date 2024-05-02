@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FptAiService } from 'src/app/services/fpt-ai/fpt-ai.service';
+import { FptAiService } from 'src/app/services/fpt/fpt-ai.service';
 
 @Component({
   selector: 'app-test',
@@ -11,7 +11,7 @@ export class TestPage implements OnInit {
   constructor(private fpt:FptAiService) { }
 
   ngOnInit() {
-    this.fpt.tts("Chào bạn Thanh nhé, dự án OK rồi đó");
+    this.fpt.speak("Chào bạn Thanh");
   }
 
 }
