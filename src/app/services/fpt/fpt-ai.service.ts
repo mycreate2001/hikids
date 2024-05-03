@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
+import { timeout } from 'rxjs';
 // import { Observable } from 'rxjs';
 const _BACKUP_LIST=["buffers","setting"];
 const _DB_TTS="tts_buffers"
@@ -17,12 +18,23 @@ export class FptAiService {
   }
   private _getLink(text:string){
     const url="/fpt"
-    return this.http.post<FptRespond>(url,text)
+    const body={text,...this.setting}
+    return this.http.post<FptRespond>(url,body).pipe(timeout(6000))
   }
 
   config(setting:Partial<FptAiSetting>){
     Object.assign(this.setting,setting);
     this._backup();
+  }
+
+  getVoices(){
+    const arrs=[{n:"Ban Mai (Nữ miền Bắc)",v:"banmai"},
+      {n:"Lê Minh (Nam miền Bắc)",v:"leminh"},
+      {n:"Thu Minh (Nữ miền Bắc)",v:"thuminh"},
+      {n:"Linh San (Nữ miền Nam)",v:"linhsan"},
+      {n:"Lan Nhi (Nữ miền Nam)",v:"lannhi"},
+    ]
+    return arrs;
   }
 
   private _backup(){
@@ -62,34 +74,50 @@ export class FptAiService {
       this.buffers=this.buffers.filter(b=>!checkExpire(b));
       if(this.buffers.length!==length) this._backup();
 
-      const buff=this.buffers.find(b=>b.text===text)
+      const buff=this.buffers.find(b=>matchBuffer(b,{text,...this.setting}))
       if(buff) {
-        this.getVoice(buff.url);
+        this._playAudio(buff.url);
         return resolve(text);
       }
      
       // new request
-      this._getLink(text).subscribe(res=>{
+      this._getLink(text)
+      .subscribe(res=>{
         if(res.error){
-          console.log(res);
+          console.warn(res);
           return;
         }
         const url=res.async;
-        const buff:AudioBuffer={url,text,createAt:Date.now()}
+        console.log(`url of '${text}':`,url)
+        const buff:AudioBuffer={
+                        url,text,
+                        createAt:Date.now(),
+                        voice:this.setting.voice,
+                        speed:this.setting.speed
+                      }
         this.buffers.push(buff);
         this._backup();
-        this.getVoice(url)
-      })
+        this._playAudio(url)
+      },
+      err=>console.log("error ",err)
+      )
     })
   }
 
 
   /** get voice from server */
-  getVoice(src:string){
+  private _playAudio(src:string){
+    let time=Date.now();
+    console.log("[_playAudio] start")
     const audio =new Audio();
     audio.autoplay=true;
     audio.src=src;
-    audio.addEventListener("loadeddata",()=>audio.play())
+    audio.addEventListener("loadeddata",()=>{
+      time=Date.now()-time;
+      console.log("[_playAudio] play %s",time);
+      audio.play()
+    })
+    // setTimeout(()=>{audio.play()},4000)
   }
 }
 
@@ -101,18 +129,25 @@ function checkExpire(buff:AudioBuffer):boolean{
   return true;
 }
 
+function matchBuffer(buff:AudioBuffer,setting:{voice:string,speed:number,text:string}):boolean{
+  if(buff.text.toLowerCase()!==setting.text.toLowerCase()) return false;
+  if(buff.speed!==setting.speed) return false;
+  if(buff.voice!==setting.voice) return false;
+  return true;
+}
+
 
 export interface FptAiSetting{
   voice:string;
-  speed:string;
-  volume:string;
+  speed:number;
+  volume:number;
 }
 
 function createFptAiSetting(...opts:Partial<FptAiSetting>[]):FptAiSetting{
   const df:FptAiSetting={
     voice:'banmai',
-    speed:'1',
-    volume:'1'
+    speed:-1,
+    volume:1
   }
   return Object.assign(df,...opts)
 }
@@ -128,4 +163,6 @@ interface AudioBuffer{
   text:string;
   url:string;
   createAt:number;
+  voice:string;
+  speed:number;
 }

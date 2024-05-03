@@ -96,7 +96,8 @@ export class WrittingPage implements OnInit {
   /** handle setting button */
   setting(){
     const props:WrittingConfigPageInput={
-      settings:this.settings
+      settings:this.settings,
+      voices:this.fpt.getVoices()
     }
     this.disp.modal(WrittingConfigPage,props)
     .then(result=>{
@@ -172,7 +173,8 @@ export class WrittingPage implements OnInit {
    * It's just effect to next sentent or next speaking
    */
   updateSetting(){
-    this._backup(); 
+    this._backup();
+    this.fpt.config({voice:this.settings.voice,speed:this.settings.speed})
     this.runing();
   }
 
@@ -240,6 +242,7 @@ export interface WrittingConfig{
   time:number;        // delay time for each reading
   speed:number;       // speed
   writeSpeed:number;
+  voice:string;       // voiceID
 }
 
 function createSetting(opts:Partial<WrittingConfig>={}):WrittingConfig{
@@ -247,8 +250,9 @@ function createSetting(opts:Partial<WrittingConfig>={}):WrittingConfig{
     wordCount:2,
     repeat:3,
     time:15,
-    speed:0.4,
-    writeSpeed:7
+    speed:-1,
+    writeSpeed:7,
+    voice:'banmai'
   }
   return Object.assign(df,opts);
 }

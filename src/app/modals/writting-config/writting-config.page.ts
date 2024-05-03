@@ -10,6 +10,8 @@ const _BACKUP_LIST=["settings"]
 export class WrittingConfigPage implements OnInit {
   /** input */
   settings!:WrittingConfig;
+
+  voices:{n:string,v:string}[]=[];
   /** internal */
   backupStr:string[]=[]
   constructor(private _modal:ModalController) { }
@@ -20,6 +22,7 @@ export class WrittingConfigPage implements OnInit {
       const data=(this as any)[key];
       return JSON.stringify(data)
     })
+    console.log("init config ",this);
   }
 
   ///////// buttons //////////////
@@ -43,10 +46,11 @@ export class WrittingConfigPage implements OnInit {
 }
 
 export type WrittingConfigPageRole="ok"|"cancel";
-export interface WrittingConfigPageInput{
-  settings:WrittingConfig
+export interface WrittingConfigPageOutput{
+  settings:WrittingConfig;
+
 }
 
-export interface WrittingConfigPageOutput extends WrittingConfigPageInput{
-
+export interface WrittingConfigPageInput extends WrittingConfigPageOutput{
+  voices:{n:string,v:string}[]
 }

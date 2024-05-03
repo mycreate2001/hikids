@@ -42,5 +42,18 @@
       </ion-input>
     </ion-item>
 
+    <ion-item>
+      <ion-icon  slot="start" color="secondary" name="hourglass-outline"></ion-icon>
+      <ion-range label="Tốc độ đọc" [(ngModel)]="settings.speed" min="-3" max="3" pin snaps>
+      </ion-range>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon  slot="start" color="secondary" name="person-outline"></ion-icon>
+      <ion-select [(ngModel)]="settings.voice" label="Giọng đọc" >
+        <ion-select-option [value]="voice.v" *ngFor="let voice of voices">{{voice.n}}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
   </ion-list>
 </ion-content>
