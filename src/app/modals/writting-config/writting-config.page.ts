@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { WrittingConfig } from 'src/app/pages/writting/writting.page';
+import { DbType, ExportParams, Params } from 'src/app/services/fpt/fpt-ai.service';
 const _BACKUP_LIST=["settings"]
 @Component({
   selector: 'app-writting-config',
@@ -10,6 +11,7 @@ const _BACKUP_LIST=["settings"]
 export class WrittingConfigPage implements OnInit {
   /** input */
   settings!:WrittingConfig;
+  params!:ExportParams;
 
   voices:{n:string,v:string}[]=[];
   /** internal */
@@ -52,5 +54,5 @@ export interface WrittingConfigPageOutput{
 }
 
 export interface WrittingConfigPageInput extends WrittingConfigPageOutput{
-  voices:{n:string,v:string}[]
+  params:ExportParams
 }

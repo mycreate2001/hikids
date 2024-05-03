@@ -5,6 +5,12 @@ import { timeout } from 'rxjs';
 const _BACKUP_LIST=["buffers","setting"];
 const _DB_TTS="tts_buffers"
 const _EXP_TIME=24*3600*1000;//ms
+const _VOICES=[ {n:"Ban Mai (Nữ miền Bắc)",v:"banmai"},
+                {n:"Lê Minh (Nam miền Bắc)",v:"leminh"},
+                {n:"Thu Minh (Nữ miền Bắc)",v:"thuminh"},
+                {n:"Linh San (Nữ miền Nam)",v:"linhsan"},
+                {n:"Lan Nhi (Nữ miền Nam)",v:"lannhi"},
+              ];
 
 @Injectable({
   providedIn: 'root'
@@ -22,45 +28,16 @@ export class FptAiService {
     return this.http.post<FptRespond>(url,body).pipe(timeout(6000))
   }
 
+
+  /////////////////// API ////////////////
+
+  /** UPDATE CONFIG */
   config(setting:Partial<FptAiSetting>){
     Object.assign(this.setting,setting);
     this._backup();
   }
 
-  getVoices(){
-    const arrs=[{n:"Ban Mai (Nữ miền Bắc)",v:"banmai"},
-      {n:"Lê Minh (Nam miền Bắc)",v:"leminh"},
-      {n:"Thu Minh (Nữ miền Bắc)",v:"thuminh"},
-      {n:"Linh San (Nữ miền Nam)",v:"linhsan"},
-      {n:"Lan Nhi (Nữ miền Nam)",v:"lannhi"},
-    ]
-    return arrs;
-  }
-
-  private _backup(){
-    const data:any={};
-    _BACKUP_LIST.forEach(key=>{
-      const val=(this as any)[key];
-      if(val!==undefined) data[key]=val;
-    })
-    localStorage.setItem(_DB_TTS,JSON.stringify(data))
-  }
-
-  private _restore(){
-    try{
-      const str=localStorage.getItem(_DB_TTS);
-      if(!str) return;
-      const data=JSON.parse(str);
-      Object.assign(this,data)
-    }
-    catch(err){
-      console.log("restore error ",err);
-    }
-  }
-
- 
-
-  /** speak */
+  /** SPEAK */
   speak(text:string,opts:Partial<FptAiSetting>={}):Promise<string>{
     return new Promise((resolve,reject)=>{
       // change setting
@@ -105,6 +82,42 @@ export class FptAiService {
     })
   }
 
+  /** GET PARAMS */
+  getParams():ExportParams{
+    const voice:ParamsList={type:'list',value:_VOICES[0].v,listNames:_VOICES};
+    const speed:ParamsRange={type:'range',value:0,step:1,min:-3,max:3};
+    const format:ParamsList={type:'list',value:'mp3',listNames:[{n:'mp3',v:'mp3'},{n:'wav',v:'wav'}]}
+    return {voice,speed,format}
+  }
+
+
+
+  //////// BACKGROUND OR PRIVATE FUNCTIONS ///////////////
+
+  /** backup all _BACKUP_LIST item to localStorage */
+  private _backup(){
+    const data:any={};
+    _BACKUP_LIST.forEach(key=>{
+      const val=(this as any)[key];
+      if(val!==undefined) data[key]=val;
+    })
+    localStorage.setItem(_DB_TTS,JSON.stringify(data))
+  }
+
+
+  /** restore all _BACKUP_LIST item from localStorage */
+  private _restore(){
+    try{
+      const str=localStorage.getItem(_DB_TTS);
+      if(!str) return;
+      const data=JSON.parse(str);
+      Object.assign(this,data)
+    }
+    catch(err){
+      console.log("restore error ",err);
+    }
+  }
+
 
   /** get voice from server */
   private _playAudio(src:string){
@@ -121,13 +134,6 @@ export class FptAiService {
     audio.addEventListener("abort",(e)=>{
       console.log(`### cancel text '${this.text}' \nERROR:`,e)
     })
-    // audio.addEventListener("loadeddata",()=>{
-    //   time=Date.now()-time;
-    //   console.log("[_playAudio] play %s",time);
-    //   audio.play()
-    // })
-
-    // setTimeout(()=>{audio.play()},4000)
   }
 }
 
@@ -175,4 +181,36 @@ interface AudioBuffer{
   createAt:number;
   voice:string;
   speed:number;
+}
+
+export type Params=ParamsList|ParamsRange
+export interface DbType<T extends {id:string}>{
+  [id:string]:Omit<T,"id">
+}
+
+export interface ExportParams{
+  speed:ParamsRange;
+  format:ParamsList;
+  voice:ParamsList;
+}
+
+interface ParamsList{
+  // id:string;
+  value:any;    //default value
+  type:'list';
+  listNames:ItemList[];
+}
+
+interface ParamsRange{
+  // id:string;
+  value:number;    //default value
+  type:'range';
+  min:number;
+  max:number;
+  step:number;
+}
+
+interface ItemList{
+  n:string;
+  v:string;
 }

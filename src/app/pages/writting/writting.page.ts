@@ -100,7 +100,7 @@ export class WrittingPage implements OnInit {
   setting(){
     const props:WrittingConfigPageInput={
       settings:this.settings,
-      voices:this.fpt.getVoices()
+      params:this.fpt.getParams()
     }
     this.disp.modal(WrittingConfigPage,props)
     .then(result=>{
