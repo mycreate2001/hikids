@@ -38,7 +38,7 @@ export class WrittingPage implements OnInit {
   /** speak times for each sentent */
   repeatCount:number=0;                        
   /** control interval function */
-  private _intervalCtr:any;                    
+  private _intervalCtr:any=null;                    
 
   constructor(
     private disp:DispService,
@@ -87,6 +87,9 @@ export class WrittingPage implements OnInit {
     //get new word
     this.pos=pos;
     this.prepareSentent();
+
+    if(this.status!=='playing') return;
+    // resume when status is playing
     this.timeCount=this.settings.time;
     this.repeatCount=this.getRepeatCount();
     this.runing();
@@ -167,6 +170,7 @@ export class WrittingPage implements OnInit {
   /** pause speaking */
   pause(){
     if(this._intervalCtr )clearInterval(this._intervalCtr);
+    this._intervalCtr=null;
   }
 
   /** update settings
@@ -178,10 +182,10 @@ export class WrittingPage implements OnInit {
     this.runing();
   }
 
-
+  /** start runing */
   runing(){
     //reset controller
-    if(this._intervalCtr) clearInterval(this._intervalCtr);
+    this.pause();
     //set new interval
     this._intervalCtr=setInterval(()=>{
       if(--this.timeCount<=0){

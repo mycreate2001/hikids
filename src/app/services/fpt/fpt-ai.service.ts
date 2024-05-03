@@ -12,7 +12,7 @@ const _EXP_TIME=24*3600*1000;//ms
 export class FptAiService {
   setting:FptAiSetting=createFptAiSetting();
   buffers:AudioBuffer[]=[]
-
+  text:string='';//current text
   constructor(private http:HttpClient) {
     this._restore();
   }
@@ -67,8 +67,8 @@ export class FptAiService {
       if(Object.keys(opts).length) this.config(opts);
       
       //correct text
-      text=text.split(" ").filter(x=>!!x).join(" ")
-
+      text=text.toLowerCase().split(/[ ,\-.:;!?]/g).filter(x=>!!x).join(" ")
+      this.text=text;
       // already getvoice -->just speak
       const length=this.buffers.length;
       this.buffers=this.buffers.filter(b=>!checkExpire(b));
@@ -83,21 +83,22 @@ export class FptAiService {
       // new request
       this._getLink(text)
       .subscribe(res=>{
-        if(res.error){
+        if(!res||res.error){
           console.warn(res);
           return;
         }
         const url=res.async;
         console.log(`url of '${text}':`,url)
         const buff:AudioBuffer={
-                        url,text,
+                        text,
+                        url,
                         createAt:Date.now(),
                         voice:this.setting.voice,
                         speed:this.setting.speed
                       }
         this.buffers.push(buff);
         this._backup();
-        this._playAudio(url)
+        setTimeout(()=>this._playAudio(url),1000)
       },
       err=>console.log("error ",err)
       )
@@ -112,11 +113,20 @@ export class FptAiService {
     const audio =new Audio();
     audio.autoplay=true;
     audio.src=src;
-    audio.addEventListener("loadeddata",()=>{
+    audio.addEventListener("canplay",()=>{
       time=Date.now()-time;
       console.log("[_playAudio] play %s",time);
       audio.play()
     })
+    audio.addEventListener("abort",(e)=>{
+      console.log(`### cancel text '${this.text}' \nERROR:`,e)
+    })
+    // audio.addEventListener("loadeddata",()=>{
+    //   time=Date.now()-time;
+    //   console.log("[_playAudio] play %s",time);
+    //   audio.play()
+    // })
+
     // setTimeout(()=>{audio.play()},4000)
   }
 }
