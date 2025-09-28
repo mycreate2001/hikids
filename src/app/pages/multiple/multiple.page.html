@@ -18,7 +18,7 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
 
-  <!-- Khi chưa bắt đầu quiz: hiển thị cấu hình -->
+  <!-- Khi chưa bắt đầu quiz -->
   <ng-container *ngIf="!quizStarted">
     <ion-card>
       <ion-card-header>
@@ -26,7 +26,6 @@
       </ion-card-header>
       <ion-card-content>
         <ion-list>
-          <!-- Chọn bảng -->
           <ion-item>
             <ion-label><strong>Chọn bảng (2–9)</strong></ion-label>
           </ion-item>
@@ -40,7 +39,6 @@
             </ion-button>
           </div>
 
-          <!-- Số câu hỏi -->
           <ion-item>
             <ion-label position="stacked"><strong>Số câu hỏi</strong></ion-label>
             <ion-select [(ngModel)]="numQuestions" placeholder="Chọn số câu">
@@ -48,23 +46,20 @@
             </ion-select>
           </ion-item>
 
-          <!-- Chế độ -->
           <ion-item>
             <ion-label><strong>Chế độ</strong></ion-label>
             <ion-select [(ngModel)]="mode" placeholder="Chọn chế độ">
-              <ion-select-option [value]="item.value" *ngFor="let item of modeTypes">{{item.label}}</ion-select-option>
+              <ion-select-option *ngFor="let item of modeTypes" [value]="item.value">{{item.label}}</ion-select-option>
             </ion-select>
           </ion-item>
 
-          <!-- Loại phép tính -->
           <ion-item>
             <ion-label><strong>Loại phép tính</strong></ion-label>
             <ion-select [(ngModel)]="opMode" placeholder="Chọn loại phép tính">
-              <ion-select-option [value]="item.value" *ngFor="let item of loaiPhepTinh">{{item.label}}</ion-select-option>
+              <ion-select-option *ngFor="let item of loaiPhepTinh" [value]="item.value">{{item.label}}</ion-select-option>
             </ion-select>
           </ion-item>
 
-          <!-- Thời gian -->
           <ion-item>
             <ion-label position="stacked"><strong>Thời gian làm bài (phút)</strong></ion-label>
             <ion-select [(ngModel)]="quizTime" placeholder="Chọn thời gian">
@@ -83,7 +78,7 @@
     </ion-card>
   </ng-container>
 
-  <!-- Khi đã bắt đầu quiz: hiển thị danh sách câu hỏi -->
+  <!-- Khi đã bắt đầu quiz -->
   <ng-container *ngIf="quizStarted">
     <ion-grid>
       <ion-row>
@@ -108,5 +103,86 @@
     <div *ngIf="submitted" class="result ion-margin-top">
       Điểm: {{ score }}/{{ currentQuestions.length }} ({{ scorePercent }}%)
     </div>
+
+    <!-- Review -->
+    <ion-card *ngIf="submitted" class="review-card">
+      <ion-card-header>
+        <ion-card-title>Kết quả của con</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="review-message">{{ getResultMessage() }}</p>
+
+        <ion-list>
+          <ion-item>
+            <ion-label>Câu đúng</ion-label>
+            <ion-note color="success" slot="end">{{ score }}</ion-note>
+          </ion-item>
+          <ion-item>
+            <ion-label>Câu sai</ion-label>
+            <ion-note color="danger" slot="end">{{ currentQuestions.length - score }}</ion-note>
+          </ion-item>
+          <ion-item>
+            <ion-label>Tỷ lệ đúng</ion-label>
+            <ion-note color="primary" slot="end">{{ scorePercent }}%</ion-note>
+          </ion-item>
+          <ion-item>
+            <ion-label>Thời gian quy định</ion-label>
+            <ion-note slot="end">{{ quizTime }} phút</ion-note>
+          </ion-item>
+          <ion-item>
+            <ion-label>Thời gian đã làm</ion-label>
+            <ion-note slot="end">{{ elapsedTimeDisplay }}</ion-note>
+          </ion-item>
+        </ion-list>
+
+        <ion-card-subtitle class="ion-margin-top">Cài đặt trước khi làm</ion-card-subtitle>
+        <ion-list>
+          <ion-item>
+            <ion-label>Bảng cửu chương</ion-label>
+            <ion-note slot="end">{{ getSelectedTables() }}</ion-note>
+          </ion-item>
+          <ion-item>
+            <ion-label>Số câu hỏi</ion-label>
+            <ion-note slot="end">{{ numQuestions }}</ion-note>
+          </ion-item>
+          <ion-item>
+            <ion-label>Chế độ</ion-label>
+            <ion-note slot="end">{{ mode === 'random' ? 'Ngẫu nhiên' : 'Theo thứ tự' }}</ion-note>
+          </ion-item>
+          <ion-item>
+            <ion-label>Loại phép tính</ion-label>
+            <ion-note slot="end">
+              {{ opMode === 'both' ? 'Cả nhân & chia' : opMode === 'mul' ? 'Chỉ nhân' : 'Chỉ chia' }}
+            </ion-note>
+          </ion-item>
+        </ion-list>
+
+        <ion-card-subtitle class="ion-margin-top">Bài thi của con</ion-card-subtitle>
+        <ion-grid>
+          <ion-row>
+            <ion-col size-xs="12" size-sm="6" size-md="4" *ngFor="let q of currentQuestions; let idx = index">
+              <ion-item lines="none">
+                <div class="mark">{{ idx+1 }}</div>
+                {{ q.a }} {{ q.op }} {{ q.b }} =
+                <span [ngClass]="{
+                  'correct': q.user === q.answer,
+                  'wrong': q.user !== q.answer
+                }">{{ displayAnswer(q.user) }}</span>
+              </ion-item>
+              <div *ngIf="q.user !== q.answer" class="answer">
+                Đáp án đúng: {{ q.answer }}
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <div class="ion-text-center ion-margin-top">
+          <ion-button color="tertiary" (click)="shareResult()">
+            <ion-icon name="share-social-outline" slot="start"></ion-icon>
+            Chia sẻ với bố mẹ
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
   </ng-container>
 </ion-content>

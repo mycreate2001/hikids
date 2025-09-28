@@ -45,6 +45,10 @@ export class MultiplePage implements OnDestroy {
   score = 0;
   scorePercent = 0;
 
+  quizStartTime = 0;
+  elapsedTime = 0;
+  elapsedTimeDisplay = '';
+
   toggleTable(t: number) {
     if (this.selectedTables.has(t)) this.selectedTables.delete(t);
     else this.selectedTables.add(t);
@@ -59,6 +63,7 @@ export class MultiplePage implements OnDestroy {
     this.quizStarted = true;
     this.submitted = false;
     this.score = 0;
+    this.quizStartTime = Date.now();
     this.startTimer(this.quizTime);
   }
 
@@ -123,12 +128,68 @@ export class MultiplePage implements OnDestroy {
     this.submitted = true;
     this.score = this.currentQuestions.filter(q => q.user === q.answer).length;
     this.scorePercent = Math.round(100 * this.score / this.currentQuestions.length);
+
+    this.elapsedTime = Math.floor((Date.now() - this.quizStartTime) / 1000);
+    const m = Math.floor(this.elapsedTime / 60);
+    const s = this.elapsedTime % 60;
+    this.elapsedTimeDisplay = `${m} phút ${s} giây`;
   }
 
   resetQuiz() {
     this.quizStarted = false;
     this.currentQuestions = [];
     clearInterval(this.timer);
+  }
+
+  getResultMessage(): string {
+    if (this.scorePercent >= 90) return "Xuất sắc! Con làm rất giỏi 👏👏";
+    if (this.scorePercent >= 70) return "Tốt lắm! Cố gắng thêm chút nữa nhé 💪";
+    if (this.scorePercent >= 50) return "Con đã làm khá, hãy luyện thêm nhé 👍";
+    return "Không sao đâu, mình cùng luyện thêm để giỏi hơn nha 🌱";
+  }
+
+  getSelectedTables(): string {
+    return Array.from(this.selectedTables).join(', ');
+  }
+
+  displayAnswer(userAnswer: number | undefined): string {
+    return userAnswer !== undefined && userAnswer !== null ? userAnswer.toString() : '—';
+  }
+
+  shareResult() {
+    let message = `📘 Kết quả bài tập Toán của con\n\n`;
+    message += `⚙️ Cài đặt trước khi làm:\n`;
+    message += `- Bảng cửu chương: ${this.getSelectedTables()}\n`;
+    message += `- Số câu hỏi: ${this.numQuestions}\n`;
+    message += `- Chế độ: ${this.mode === 'random' ? 'Ngẫu nhiên' : 'Theo thứ tự'}\n`;
+    message += `- Loại phép tính: ${this.opMode === 'both' ? 'Cả nhân & chia' : this.opMode === 'mul' ? 'Chỉ nhân' : 'Chỉ chia'}\n`;
+    message += `- Thời gian quy định: ${this.quizTime} phút\n\n`;
+
+    message += `🎯 Kết quả:\n`;
+    message += `- Điểm: ${this.score}/${this.currentQuestions.length}\n`;
+    message += `- Tỷ lệ đúng: ${this.scorePercent}%\n`;
+    message += `- Thời gian đã làm: ${this.elapsedTimeDisplay}\n`;
+    message += `- Nhận xét: ${this.getResultMessage()}\n\n`;
+
+    message += `📑 Bài thi chi tiết:\n`;
+    this.currentQuestions.forEach((q, idx) => {
+      const userAns = this.displayAnswer(q.user);
+      if (q.user === q.answer) {
+        message += `${idx + 1}. ${q.a} ${q.op} ${q.b} = ${userAns} ✅\n`;
+      } else {
+        message += `${idx + 1}. ${q.a} ${q.op} ${q.b} = ${userAns} ❌ (Đúng: ${q.answer})\n`;
+      }
+    });
+
+    if (navigator.share) {
+      navigator.share({
+        title: 'Kết quả Toán của con',
+        text: message,
+      }).catch(err => console.log('Share cancelled', err));
+    } else {
+      navigator.clipboard.writeText(message);
+      alert("Đã copy toàn bộ kết quả vào clipboard! Con có thể gửi cho bố mẹ.");
+    }
   }
 
   ngOnDestroy() {
