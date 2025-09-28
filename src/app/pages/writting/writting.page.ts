@@ -8,11 +8,9 @@ const _BACKUP_LIST=["settings","text"];
 const _DB_WRITING="writting_config"
 
 const _SPECIALS= [
-  {v:/\./g,n:" -- chấm. "},{v:/\,/g,n:" --phẩy, "},
-  {v:/\?/g,n:" -- chấm hỏi? "},{v:/\:/g,n:" --hai chấm: "},
-  {v:/\;/g,n:" -- chấm phẩy; "},
-  // {v:/\n/g,n:" xuống dòng\n"},
-  {v:/\!/g,n:" -- chấm than! "}
+  {v:/\./g,n:" chấm "},{v:/\,/g,n:" phẩy "},
+  {v:/\?/g,n:" hỏi chấm "},{v:/\:/g,n:" hai chấm "},
+  {v:/\;/g,n:" chấm phẩy "},{v:/\!/g,n:" chấm than "},
 ];
 
 @Component({

@@ -38,7 +38,7 @@
           <ion-item lines="none">
             <div class="mark">{{pv+1}}</div>
             {{view.before}}
-            <input class="ip" type="number" min="0" maxlength="2" [(ngModel)]="view.answer" [ngClass]="{'wrong':view.checked}"/>
+            <input class="ip" type="number" min="0" maxlength="4" [(ngModel)]="view.answer" [ngClass]="{'wrong':view.checked}"/>
             {{view.after}}
           </ion-item>
       </ion-col>

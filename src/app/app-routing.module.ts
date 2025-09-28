@@ -38,13 +38,18 @@ const routes: Routes = [
   {
     path: 'writting',
     loadChildren: () => import('./pages/writting/writting.module').then( m => m.WrittingPageModule)
-  },  {
+  },
+  {
     path: 'writting-config',
     loadChildren: () => import('./modals/writting-config/writting-config.module').then( m => m.WrittingConfigPageModule)
   },
   {
     path: 'test',
     loadChildren: () => import('./pages/test/test.module').then( m => m.TestPageModule)
+  },
+  {
+    path: 'multiple',
+    loadChildren: () => import('./pages/multiple/multiple.module').then( m => m.MultiplePageModule)
   },
 
 

@@ -44,7 +44,7 @@ export class FptAiService {
       if(Object.keys(opts).length) this.config(opts);
       
       //correct text
-      text=text.toLowerCase().split(/[ ,\-.:;!?]/g).filter(x=>!!x).join(" ")
+      text=text.toLowerCase().split(/[ \*"',\-.:;!?]/g).filter(x=>!!x).join(" ")
       this.text=text;
       // already getvoice -->just speak
       const length=this.buffers.length;
@@ -75,7 +75,7 @@ export class FptAiService {
                       }
         this.buffers.push(buff);
         this._backup();
-        setTimeout(()=>this._playAudio(url),1000)
+        setTimeout(()=>this._playAudio(url),2000)
       },
       err=>console.log("error ",err)
       )
@@ -126,12 +126,12 @@ export class FptAiService {
     const audio =new Audio();
     audio.autoplay=true;
     audio.src=src;
-    audio.addEventListener("canplay",()=>{
+    audio.addEventListener("loadeddata",()=>{
       time=Date.now()-time;
       console.log("[_playAudio] play %s",time);
       audio.play()
     })
-    audio.addEventListener("abort",(e)=>{
+    audio.addEventListener("error",(e)=>{
       console.log(`### cancel text '${this.text}' \nERROR:`,e)
     })
   }

@@ -1,0 +1,40 @@
+.row {
+  margin-bottom: 10px;
+}
+
+.mark {
+  border: solid 0.1px;
+  padding: 3px;
+  color: blue;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  text-align: center;
+  margin-right: 12px;
+}
+
+.ip {
+  width: 70px;
+  margin-left: 8px;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  text-align: center;
+  font-size: 16px;
+}
+
+.ip:disabled {
+  background: transparent;
+  color: #666;
+}
+
+.answer {
+  font-size: 13px;
+  color: #e53e3e;
+  margin-left: 42px;
+}
+
+.result {
+  font-weight: 600;
+  font-size: 18px;
+  text-align: center;
+}
