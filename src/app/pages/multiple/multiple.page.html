@@ -18,7 +18,7 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
 
-  <!-- Khi chưa bắt đầu quiz -->
+  <!-- Cài đặt khi chưa bắt đầu -->
   <ng-container *ngIf="!quizStarted">
     <ion-card>
       <ion-card-header>
@@ -90,10 +90,15 @@
             {{ q.a }} {{ q.op }} {{ q.b }} =
             <input class="ip" type="number" min="0" maxlength="4"
                    [(ngModel)]="q.user"
+                   (focus)="onFocus(q)"
+                   (blur)="onBlur(q)"
                    [disabled]="submitted"/>
           </ion-item>
           <div *ngIf="submitted && q.user !== q.answer" class="answer">
             Đáp án đúng: {{ q.answer }}
+          </div>
+          <div *ngIf="submitted" class="time-detail">
+            ⏱ {{ q.timeSpent ?? 0 }} giây
           </div>
         </ion-col>
       </ion-row>
@@ -133,8 +138,13 @@
             <ion-label>Thời gian đã làm</ion-label>
             <ion-note slot="end">{{ elapsedTimeDisplay }}</ion-note>
           </ion-item>
+          <ion-item>
+            <ion-label>Thời gian TB / câu</ion-label>
+            <ion-note slot="end">{{ avgTimePerQuestion }} giây</ion-note>
+          </ion-item>
         </ion-list>
 
+        <!-- Cài đặt trước khi làm -->
         <ion-card-subtitle class="ion-margin-top">Cài đặt trước khi làm</ion-card-subtitle>
         <ion-list>
           <ion-item>
@@ -171,6 +181,9 @@
               </ion-item>
               <div *ngIf="q.user !== q.answer" class="answer">
                 Đáp án đúng: {{ q.answer }}
+              </div>
+              <div class="time-detail">
+                ⏱ {{ q.timeSpent ?? 0 }} giây
               </div>
             </ion-col>
           </ion-row>

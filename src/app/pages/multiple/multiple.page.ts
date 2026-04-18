@@ -7,6 +7,9 @@ interface Question {
   op: '×' | '÷';
   answer: number;
   user?: number;
+  startTime?: number;
+  endTime?: number;
+  timeSpent?: number;
 }
 
 @Component({
@@ -48,6 +51,8 @@ export class MultiplePage implements OnDestroy {
   quizStartTime = 0;
   elapsedTime = 0;
   elapsedTimeDisplay = '';
+
+  avgTimePerQuestion: string = '0';
 
   toggleTable(t: number) {
     if (this.selectedTables.has(t)) this.selectedTables.delete(t);
@@ -123,6 +128,19 @@ export class MultiplePage implements OnDestroy {
     this.timerDisplay = `${m}:${s.toString().padStart(2, '0')}`;
   }
 
+  onFocus(q: Question) {
+    q.startTime = Date.now();
+  }
+
+  onBlur(q: Question) {
+    if (q.startTime) {
+      q.endTime = Date.now();
+      const spent = Math.floor((q.endTime - q.startTime) / 1000);
+      q.timeSpent = (q.timeSpent ?? 0) + spent;
+      q.startTime = undefined;
+    }
+  }
+
   submitQuiz() {
     clearInterval(this.timer);
     this.submitted = true;
@@ -133,6 +151,9 @@ export class MultiplePage implements OnDestroy {
     const m = Math.floor(this.elapsedTime / 60);
     const s = this.elapsedTime % 60;
     this.elapsedTimeDisplay = `${m} phút ${s} giây`;
+
+    const total = this.currentQuestions.reduce((sum, q) => sum + (q.timeSpent ?? 0), 0);
+    this.avgTimePerQuestion = total > 0 ? (total / this.currentQuestions.length).toFixed(1) : '0';
   }
 
   resetQuiz() {
@@ -169,15 +190,17 @@ export class MultiplePage implements OnDestroy {
     message += `- Điểm: ${this.score}/${this.currentQuestions.length}\n`;
     message += `- Tỷ lệ đúng: ${this.scorePercent}%\n`;
     message += `- Thời gian đã làm: ${this.elapsedTimeDisplay}\n`;
+    message += `- Thời gian TB / câu: ${this.avgTimePerQuestion} giây\n`;
     message += `- Nhận xét: ${this.getResultMessage()}\n\n`;
 
     message += `📑 Bài thi chi tiết:\n`;
     this.currentQuestions.forEach((q, idx) => {
       const userAns = this.displayAnswer(q.user);
+      const spent = q.timeSpent ?? 0;
       if (q.user === q.answer) {
-        message += `${idx + 1}. ${q.a} ${q.op} ${q.b} = ${userAns} ✅\n`;
+        message += `${idx + 1}. ${q.a} ${q.op} ${q.b} = ${userAns} ✅ (${spent}s)\n`;
       } else {
-        message += `${idx + 1}. ${q.a} ${q.op} ${q.b} = ${userAns} ❌ (Đúng: ${q.answer})\n`;
+        message += `${idx + 1}. ${q.a} ${q.op} ${q.b} = ${userAns} ❌ (Đúng: ${q.answer}, ${spent}s)\n`;
       }
     });
 
